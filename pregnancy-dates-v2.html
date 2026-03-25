@@ -1,0 +1,1310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pregnancy Dates</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:      #0f1923;
+    --surface: #172130;
+    --card:    #1e2d3d;
+    --border:  #2a3f54;
+    --ink:     #e8edf2;
+    --muted:   #8aa4bc;
+    --accent:  #3b9eff;
+    --gold:    #f0c060;
+    --danger:  #e05a5a;
+    --green:   #3dba72;
+    --amber:   #f0a050;
+    --t1c:     #3b9eff;
+    --t2c:     #3dba72;
+    --t3c:     #f0a050;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    background-image: radial-gradient(ellipse at 60% 0%, #1a2d42 0%, #0f1923 60%);
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--ink);
+    padding: 2rem 1rem 4rem;
+  }
+
+  .page { width: 100%; max-width: 660px; }
+
+  /* ── Masthead ── */
+  .masthead {
+    text-align: center;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 1.25rem 0 1.5rem;
+    margin-bottom: 2rem;
+    position: relative;
+  }
+  .masthead::before { content: '✦'; position: absolute; top: 50%; left: 0; transform: translateY(-50%); color: var(--accent); font-size: 0.8rem; opacity: 0.6; }
+  .masthead::after  { content: '✦'; position: absolute; top: 50%; right: 0; transform: translateY(-50%); color: var(--accent); font-size: 0.8rem; opacity: 0.6; }
+  .kicker { font-family: 'DM Mono', monospace; font-size: 0.6rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.4rem; }
+  h1 { font-family: 'Syne', sans-serif; font-size: clamp(1.8rem, 6vw, 2.8rem); font-weight: 800; letter-spacing: -0.02em; line-height: 1; }
+
+  /* ── Section ── */
+  .section { background: var(--surface); border: 1px solid var(--border); padding: 1.1rem 1.25rem; margin-bottom: 1rem; }
+  .section-title {
+    font-family: 'DM Mono', monospace; font-size: 0.58rem; letter-spacing: 0.2em;
+    text-transform: uppercase; color: var(--muted); margin-bottom: 0.8rem;
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+  .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); display: block; }
+
+  /* ── Input ── */
+  .field { display: flex; flex-direction: column; gap: 0.3rem; }
+  label { font-family: 'DM Mono', monospace; font-size: 0.58rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); }
+  input[type="text"] {
+    background: var(--card); border: 1px solid var(--border); border-bottom: 2px solid var(--border);
+    padding: 0.5rem 0.65rem; font-family: 'DM Mono', monospace; font-size: 0.95rem; color: var(--ink);
+    width: 100%; outline: none; transition: border-color 0.2s;
+  }
+  input[type="text"]::placeholder { color: var(--muted); opacity: 0.4; }
+  input[type="text"]:focus { border-bottom-color: var(--accent); }
+
+  .ghost-preview {
+    min-height: 1.1rem; font-family: 'DM Mono', monospace; font-size: 0.6rem;
+    color: var(--accent); opacity: 1; padding-top: 0.2rem;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+
+  /* ── Risk toggle ── */
+  .risk-toggle { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+  .risk-btn {
+    font-family: 'DM Mono', monospace;
+    background: var(--card); border: 1px solid var(--border); color: var(--muted);
+    cursor: pointer; transition: all 0.15s;
+    padding: 0.65rem 0.85rem;
+    text-align: left; display: flex; flex-direction: column; gap: 0.35rem;
+  }
+  .risk-btn:hover { border-color: var(--accent); color: var(--ink); }
+  .risk-btn.active { background: rgba(59,158,255,0.10); border-color: var(--accent); }
+  .risk-btn.active.high { background: rgba(240,160,80,0.10); border-color: var(--amber); }
+
+  .risk-btn-name {
+    font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--muted); transition: color 0.15s;
+  }
+  .risk-btn.active     .risk-btn-name { color: var(--accent); }
+  .risk-btn.active.high .risk-btn-name { color: var(--amber); }
+
+  .risk-btn-desc {
+    font-size: 0.6rem; letter-spacing: 0.03em; line-height: 1.7;
+    color: var(--muted); transition: color 0.15s;
+  }
+  .risk-btn.active      .risk-btn-desc { color: var(--ink); opacity: 0.75; }
+  .risk-btn:hover:not(.active) .risk-btn-desc { color: var(--ink); opacity: 0.5; }
+  .risk-desc { display: none; }
+
+  /* ── Results ── */
+  .results { display: none; }
+  .results.visible { display: block; animation: fadeUp 0.3s ease; }
+
+  /* ── EDD banner ── */
+  .edd-banner {
+    background: var(--card); border: 1px solid var(--border); border-left: 3px solid var(--accent);
+    padding: 1rem 1.25rem; margin-bottom: 1rem;
+    display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;
+  }
+  .edd-block { display: flex; flex-direction: column; gap: 0.15rem; }
+  .edd-label { font-family: 'DM Mono', monospace; font-size: 0.55rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); }
+  .edd-value { font-family: 'Syne', sans-serif; font-size: 1.5rem; font-weight: 800; color: var(--accent); line-height: 1; }
+  .edd-sub { font-family: 'DM Mono', monospace; font-size: 0.6rem; color: var(--muted); }
+  .edd-divider { width: 1px; height: 2.5rem; background: var(--border); flex-shrink: 0; }
+
+  /* ── Progress bar ── */
+  .progress-wrap { background: var(--card); border: 1px solid var(--border); padding: 0.85rem 1.25rem; margin-bottom: 1rem; }
+  .progress-label { font-family: 'DM Mono', monospace; font-size: 0.58rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.55rem; display: flex; justify-content: space-between; }
+  .progress-track { height: 6px; background: var(--border); position: relative; display: flex; overflow: hidden; }
+  .p-t1 { background: var(--t1c); }
+  .p-t2 { background: var(--t2c); }
+  .p-t3 { background: var(--t3c); }
+  .p-rem { background: var(--border); flex: 1; }
+  .progress-now {
+    position: absolute; top: -2px; width: 2px; height: 10px;
+    background: white; opacity: 0.9; transform: translateX(-50%); z-index: 2;
+  }
+  .progress-ticks { display: flex; justify-content: space-between; margin-top: 0.35rem; font-family: 'DM Mono', monospace; font-size: 0.5rem; color: var(--muted); }
+
+  /* ── Trimesters ── */
+  .trimesters { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.5rem; margin-bottom: 1rem; }
+  .tri-card { background: var(--card); border: 1px solid var(--border); border-top: 2px solid var(--border); padding: 0.8rem 1rem; }
+  .tri-card.t1 { border-top-color: var(--t1c); }
+  .tri-card.t2 { border-top-color: var(--t2c); }
+  .tri-card.t3 { border-top-color: var(--t3c); }
+  .tri-card.current.t1 { background: rgba(59,158,255,0.06); }
+  .tri-card.current.t2 { background: rgba(61,186,114,0.06); }
+  .tri-card.current.t3 { background: rgba(240,160,80,0.06); }
+  .tri-name { font-family: 'DM Mono', monospace; font-size: 0.55rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.2rem; }
+  .tri-weeks { font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700; color: var(--ink); line-height: 1.2; }
+  .tri-dates { font-family: 'DM Mono', monospace; font-size: 0.56rem; color: var(--muted); margin-top: 0.25rem; line-height: 1.6; }
+  .tri-tag {
+    display: inline-block; margin-top: 0.3rem; font-family: 'DM Mono', monospace;
+    font-size: 0.5rem; letter-spacing: 0.12em; text-transform: uppercase; padding: 0.1rem 0.4rem;
+  }
+  .t1 .tri-tag { background: rgba(59,158,255,0.15); border: 1px solid rgba(59,158,255,0.3); color: var(--t1c); }
+  .t2 .tri-tag { background: rgba(61,186,114,0.15); border: 1px solid rgba(61,186,114,0.3); color: var(--t2c); }
+  .t3 .tri-tag { background: rgba(240,160,80,0.15); border: 1px solid rgba(240,160,80,0.3); color: var(--t3c); }
+
+  /* ── Visit schedule ── */
+  .schedule-section { background: var(--surface); border: 1px solid var(--border); padding: 1.1rem 1.25rem; margin-bottom: 1rem; }
+  .schedule-header {
+    font-family: 'DM Mono', monospace; font-size: 0.58rem; letter-spacing: 0.2em;
+    text-transform: uppercase; color: var(--muted); margin-bottom: 0.75rem;
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+  .schedule-header::after { content: ''; flex: 1; height: 1px; background: var(--border); display: block; }
+
+  .visit-row {
+    display: grid;
+    grid-template-columns: 5.5rem 3.5rem 1fr;
+    align-items: start;
+    padding: 0.55rem 0.25rem;
+    border-bottom: 1px solid var(--border);
+    gap: 0.75rem;
+  }
+  .visit-row:last-child { border-bottom: none; }
+  .visit-row.past { opacity: 0.5; }
+  .visit-row.is-next { background: rgba(61,186,114,0.06); margin: 0 -1.25rem; padding: 0.55rem 1.5rem; }
+  .visit-row.is-today { background: rgba(59,158,255,0.07); margin: 0 -1.25rem; padding: 0.55rem 1.5rem; }
+
+  .visit-date { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--ink); line-height: 1.4; padding-top: 0.1rem; }
+  .visit-dow { font-size: 0.57rem; color: var(--muted); display: block; }
+
+  .ga-badge {
+    display: inline-block; font-family: 'DM Mono', monospace; font-size: 0.6rem;
+    padding: 0.1rem 0.4rem; border: 1px solid var(--border); background: var(--card); color: var(--muted);
+    margin-top: 0.1rem;
+  }
+  .visit-row.tri1 .ga-badge { border-color: rgba(59,158,255,0.35); color: var(--t1c); background: rgba(59,158,255,0.07); }
+  .visit-row.tri2 .ga-badge { border-color: rgba(61,186,114,0.35); color: var(--t2c); background: rgba(61,186,114,0.07); }
+  .visit-row.tri3 .ga-badge { border-color: rgba(240,160,80,0.35); color: var(--t3c); background: rgba(240,160,80,0.07); }
+
+  /* ── Visit right column: tag + tasks ── */
+  .visit-right { display: flex; flex-direction: column; gap: 0.35rem; }
+
+  .visit-tag-cell { font-family: 'DM Mono', monospace; font-size: 0.58rem; }
+  .tag-next  { color: var(--green); }
+  .tag-today { color: var(--accent); }
+  .tag-past  { color: var(--muted); opacity: 0.5; font-size: 0.54rem; }
+
+  /* ── Clinical task pills ── */
+  .task-list { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.1rem; }
+
+  .task-pill {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.56rem; letter-spacing: 0.04em;
+    padding: 0.15rem 0.5rem;
+    border-radius: 0;
+    white-space: nowrap;
+    line-height: 1.4;
+  }
+
+  /* Fixed task — solid colored left border */
+  .task-pill.fixed {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    border-left: 2px solid var(--accent);
+    color: var(--ink);
+    opacity: 0.85;
+  }
+  .task-pill.fixed.vaccine {
+    border-left-color: var(--green);
+  }
+  .task-pill.fixed.lab {
+    border-left-color: #a78bfa; /* purple for labs */
+  }
+  .task-pill.fixed.screen {
+    border-left-color: var(--gold);
+  }
+
+  /* Range/window task — dashed border, softer */
+  .task-pill.window {
+    background: rgba(240,192,96,0.06);
+    border: 1px dashed rgba(240,192,96,0.4);
+    color: var(--gold);
+  }
+  .task-pill.window::before {
+    content: '◈ ';
+    font-size: 0.5rem;
+    opacity: 0.7;
+  }
+
+  .task-pill.nst {
+    background: rgba(244,114,182,0.08);
+    border: 1px solid rgba(244,114,182,0.4);
+    border-left: 2px solid #f472b6;
+    color: #f472b6;
+  }
+    display: flex; gap: 1rem; flex-wrap: wrap;
+    margin-top: 0.75rem; padding-top: 0.65rem;
+    border-top: 1px solid var(--border);
+    font-family: 'DM Mono', monospace; font-size: 0.56rem; color: var(--muted);
+    align-items: center;
+  }
+  .legend-swatch {
+    display: inline-block; width: 10px; height: 10px;
+    border: 1px solid var(--border); border-left-width: 2px;
+    vertical-align: middle; margin-right: 0.3rem;
+    background: rgba(255,255,255,0.04);
+  }
+  .legend-window {
+    display: inline-block; width: 10px; height: 10px;
+    border: 1px dashed rgba(240,192,96,0.5);
+    background: rgba(240,192,96,0.06);
+    vertical-align: middle; margin-right: 0.3rem;
+  }
+
+  .date-triple {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr auto 1fr;
+    align-items: start;
+    gap: 0.6rem;
+  }
+  .date-pair {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: start;
+    gap: 0.75rem;
+  }
+  .pair-arrow {
+    font-family: 'Syne', sans-serif; font-size: 1.3rem; font-weight: 700;
+    color: var(--accent); opacity: 0.5;
+    padding-top: 1.5rem; text-align: center; user-select: none;
+  }
+  .field-note {
+    font-family: 'DM Sans', sans-serif; font-size: 0.58rem;
+    text-transform: none; letter-spacing: 0; color: var(--muted); font-weight: 300;
+    opacity: 0.7; margin-left: 0.3rem;
+  }
+  input.driver { border-bottom-color: var(--accent) !important; }
+  input.derived { border-bottom-color: var(--gold) !important; color: var(--gold) !important; }
+
+  /* ── Collapsible antenatal section ── */
+  .ant-section {
+    border: 1px solid var(--border);
+    margin-bottom: 1.5rem;
+    background: var(--surface);
+  }
+  .ant-collapse-btn {
+    width: 100%; display: flex; align-items: center; gap: 0.6rem;
+    padding: 0.75rem 1rem;
+    background: none; border: none; cursor: pointer;
+    font-family: 'DM Mono', monospace; text-align: left;
+  }
+  .ant-collapse-btn:hover { background: rgba(255,255,255,0.03); }
+  .ant-collapse-label {
+    font-size: 0.65rem; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--ink); font-weight: 500; flex: 1;
+  }
+  .ant-collapse-meta {
+    font-size: 0.58rem; color: var(--muted); letter-spacing: 0.05em;
+    transition: opacity 0.2s;
+  }
+  .ant-collapse-arrow {
+    font-size: 0.7rem; color: var(--muted);
+    transition: transform 0.2s; display: inline-block;
+  }
+  .ant-section.open .ant-collapse-arrow { transform: rotate(90deg); }
+  .ant-body {
+    display: none;
+    padding: 0 1rem 1rem;
+    border-top: 1px solid var(--border);
+  }
+  .ant-section.open .ant-body { display: block; }
+  .ant-desc { padding-top: 0.75rem; }
+
+  /* ── Antenatal testing ── */
+  .ant-desc {
+    font-family: 'DM Sans', sans-serif; font-size: 0.72rem; color: var(--muted);
+    margin-bottom: 0.65rem; line-height: 1.5;
+  }
+  .ant-grid {
+    display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.5rem;
+  }
+  .ant-btn {
+    font-family: 'DM Mono', monospace; font-size: 0.62rem; letter-spacing: 0.06em;
+    padding: 0.35rem 0.75rem;
+    background: var(--card); border: 1px solid var(--border); color: var(--muted);
+    cursor: pointer; transition: all 0.15s; white-space: nowrap;
+  }
+  .ant-btn:hover { border-color: var(--accent); color: var(--ink); }
+  .ant-btn.active {
+    background: rgba(59,158,255,0.12); border-color: var(--accent); color: var(--accent);
+  }
+
+  /* Per-indication diag date row */
+  .ant-diag-row {
+    display: flex; align-items: center; gap: 0.75rem;
+    padding: 0.5rem 0; border-bottom: 1px solid var(--border); flex-wrap: wrap;
+  }
+  .ant-diag-row:last-child { border-bottom: none; }
+  .ant-diag-name {
+    font-family: 'DM Mono', monospace; font-size: 0.65rem; color: var(--accent);
+    min-width: 9rem;
+  }
+  .ant-diag-field { display: flex; flex-direction: column; gap: 0.15rem; flex: 1; min-width: 130px; }
+  .ant-diag-field label { font-size: 0.54rem; }
+  .ant-diag-field input {
+    font-size: 0.78rem; padding: 0.35rem 0.5rem;
+  }
+  .ant-diag-ghost {
+    font-family: 'DM Mono', monospace; font-size: 0.56rem; color: var(--accent);
+    opacity: 0.75; min-height: 0.9rem; padding-top: 0.1rem;
+  }
+  .ant-nst-info {
+    font-family: 'DM Mono', monospace; font-size: 0.58rem; color: var(--muted);
+    padding: 0.5rem 0; border-top: 1px solid var(--border); margin-top: 0.25rem;
+    line-height: 1.7;
+  }
+
+  @media (max-width: 560px) {
+    .date-triple { grid-template-columns: 1fr; }
+    .pair-arrow { padding-top: 0; transform: rotate(90deg); margin: 0 auto; width: 1.5rem; }
+  }
+
+  /* ── Disclaimer ── */
+  .disclaimer {
+    font-family: 'DM Sans', sans-serif; font-size: 0.72rem; line-height: 1.6;
+    color: #c8a84a;
+    background: rgba(240,192,96,0.08);
+    border: 1px solid rgba(240,192,96,0.3);
+    border-left: 3px solid var(--gold);
+    padding: 0.7rem 1rem;
+    margin-bottom: 1.75rem;
+  }
+  .disclaimer strong { color: var(--gold); font-weight: 600; }
+
+  /* ── Footer ── */
+  .page-footer {
+    text-align: center;
+    padding: 2rem 0 0.5rem;
+    font-family: 'DM Mono', monospace; font-size: 0.62rem;
+    color: var(--muted);
+    letter-spacing: 0.12em;
+    border-top: 1px solid var(--border);
+    margin-top: 2rem;
+  }
+
+  /* ── Guidelines section ── */
+  .guidelines-section {
+    border: 1px solid var(--border);
+    margin-top: 2rem;
+    background: var(--surface);
+  }
+  .guidelines-btn {
+    width: 100%; display: flex; align-items: center; gap: 0.6rem;
+    padding: 0.85rem 1rem;
+    background: none; border: none; cursor: pointer; text-align: left;
+  }
+  .guidelines-btn:hover { background: rgba(255,255,255,0.03); }
+  .guidelines-label {
+    font-family: 'DM Mono', monospace; font-size: 0.65rem;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--ink); font-weight: 500; flex: 1;
+  }
+  .guidelines-sub {
+    font-family: 'DM Mono', monospace; font-size: 0.58rem;
+    color: var(--muted); letter-spacing: 0.04em;
+  }
+  .guidelines-arrow {
+    font-size: 0.7rem; color: var(--muted);
+    transition: transform 0.2s; display: inline-block;
+  }
+  .guidelines-section.open .guidelines-arrow { transform: rotate(90deg); }
+  .guidelines-body {
+    display: none;
+    padding: 0 1.25rem 1.25rem;
+    border-top: 1px solid var(--border);
+  }
+  .guidelines-section.open .guidelines-body { display: block; }
+
+  .gl-entry {
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .gl-entry:last-of-type { border-bottom: none; }
+  .gl-name {
+    font-family: 'DM Mono', monospace; font-size: 0.68rem;
+    color: var(--accent); letter-spacing: 0.06em;
+    margin-bottom: 0.3rem;
+  }
+  .gl-qualifier {
+    font-size: 0.58rem; color: var(--muted); font-weight: 400;
+    letter-spacing: 0.03em; margin-left: 0.4rem;
+  }
+  .gl-detail {
+    font-family: 'DM Sans', sans-serif; font-size: 0.72rem;
+    color: var(--ink); line-height: 1.5; opacity: 0.85;
+  }
+  .gl-sub-entries { display: flex; flex-direction: column; gap: 0.3rem; }
+  .gl-sub {
+    display: flex; justify-content: space-between; align-items: baseline;
+    gap: 1rem; flex-wrap: wrap;
+  }
+  .gl-sub-label {
+    font-family: 'DM Sans', sans-serif; font-size: 0.7rem;
+    color: var(--ink); opacity: 0.8;
+  }
+  .gl-sub-detail {
+    font-family: 'DM Mono', monospace; font-size: 0.62rem;
+    color: var(--muted); white-space: nowrap;
+  }
+  .gl-sub-warn .gl-sub-label { color: var(--amber); opacity: 1; }
+  .gl-sub-warn .gl-sub-detail { color: var(--amber); }
+  .gl-disclaimer {
+    font-family: 'DM Sans', sans-serif; font-size: 0.65rem;
+    color: var(--muted); line-height: 1.6;
+    margin-top: 1rem; padding-top: 0.75rem;
+    border-top: 1px solid var(--border);
+    font-style: italic;
+  }
+
+  /* ── Animations ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 500px) {
+    .trimesters { grid-template-columns: 1fr; }
+    .edd-divider { display: none; }
+    .visit-row { grid-template-columns: 4.5rem 3rem 1fr; gap: 0.5rem; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="masthead">
+    <p class="kicker">Obstetric Calculator</p>
+    <h1>Pregnancy Dates</h1>
+  </header>
+
+  <div class="disclaimer">
+    <strong>Demonstration tool only.</strong> This calculator is not verified medical advice and has not been validated for clinical use. Always consult a qualified healthcare provider for prenatal care and medical decisions.
+  </div>
+
+  <!-- Input -->
+  <div class="section">
+    <div class="section-title">Dates — enter any field</div>
+    <div class="date-triple">
+      <div class="field">
+        <label for="lmpInput">LMP <span class="field-note">Last Menstrual Period</span></label>
+        <input type="text" id="lmpInput" placeholder="mm/dd/yyyy or t−N" maxlength="20" autocomplete="off" oninput="onDateInput(event,'lmp')">
+        <div class="ghost-preview" id="lmpGhost"></div>
+      </div>
+      <div class="pair-arrow">→</div>
+      <div class="field">
+        <label for="gaInput">GA <span class="field-note">Gestational Age</span></label>
+        <input type="text" id="gaInput" placeholder="32w4d or 32w" maxlength="10" autocomplete="off" oninput="onDateInput(event,'ga')">
+        <div class="ghost-preview" id="gaGhost"></div>
+      </div>
+      <div class="pair-arrow">→</div>
+      <div class="field">
+        <label for="eddInput">EDD <span class="field-note">Due Date</span></label>
+        <input type="text" id="eddInput" placeholder="mm/dd/yyyy or t+N" maxlength="20" autocomplete="off" oninput="onDateInput(event,'edd')">
+        <div class="ghost-preview" id="eddGhost"></div>
+      </div>
+    </div>
+
+    <div style="margin-top:1rem;">
+      <div class="section-title" style="margin-bottom:0.5rem;">Visit Frequency</div>
+      <div class="risk-toggle">
+
+        <button class="risk-btn active" id="btnAvg" onclick="setRisk('avg')">
+          <span class="risk-btn-name">Average-risk</span>
+          <span class="risk-btn-desc">≤28w: every 6w<br>28–36w: every 4w<br>36w+: every 1–2w</span>
+        </button>
+
+        <button class="risk-btn" id="btnHigh" onclick="setRisk('high')">
+          <span class="risk-btn-name">High-risk</span>
+          <span class="risk-btn-desc">≤28w: every 4w<br>28–36w: every 2w<br>36w+: weekly</span>
+        </button>
+
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Results -->
+  <div class="results" id="results">
+
+    <div class="edd-banner" id="eddBanner"></div>
+
+    <div class="progress-wrap" id="progressWrap"></div>
+
+    <div class="trimesters" id="trimesters"></div>
+
+    <!-- Antenatal Testing — collapsible -->
+    <div class="ant-section">
+      <button class="ant-collapse-btn" id="antCollapseBtn" onclick="toggleAntSection()">
+        <span class="ant-collapse-label">Antenatal Testing</span>
+        <span class="ant-collapse-meta" id="antCollapseMeta">tap to expand</span>
+        <span class="ant-collapse-arrow" id="antCollapseArrow">▸</span>
+      </button>
+      <div class="ant-body" id="antBody">
+        <div class="ant-desc">Select indications to add NST+AFI to the visit schedule</div>
+        <div class="ant-grid" id="antGrid">
+          <button class="ant-btn" data-key="ama"        onclick="toggleAnt('ama')">AMA</button>
+          <button class="ant-btn" data-key="gdm"        onclick="toggleAnt('gdm')">GDM</button>
+          <button class="ant-btn" data-key="dm_pregest" onclick="toggleAnt('dm_pregest')">Pre-gestational DM</button>
+          <button class="ant-btn" data-key="htn"        onclick="toggleAnt('htn')">Hypertension</button>
+          <button class="ant-btn" data-key="iugr"       onclick="toggleAnt('iugr')">IUGR / FGR</button>
+          <button class="ant-btn" data-key="ob2"        onclick="toggleAnt('ob2')">Obesity BMI 35–39</button>
+          <button class="ant-btn" data-key="ob3"        onclick="toggleAnt('ob3')">Obesity BMI ≥40</button>
+          <button class="ant-btn" data-key="oligo"      onclick="toggleAnt('oligo')">Oligohydramnios</button>
+          <button class="ant-btn" data-key="prior_iufd" onclick="toggleAnt('prior_iufd')">Prior IUFD</button>
+        </div>
+        <div id="antDiagFields"></div>
+      </div>
+    </div>
+
+    <div class="schedule-section">
+      <div class="schedule-header" id="schedHeader">Prenatal Visit Schedule</div>
+      <div id="visitList"></div>
+    </div>
+
+  </div>
+
+  <div class="guidelines-section">
+    <button class="guidelines-btn" onclick="toggleGuidelines()">
+      <span class="guidelines-label">Rough Guidelines</span>
+      <span class="guidelines-sub">antenatal testing reference</span>
+      <span class="guidelines-arrow" id="guidelinesArrow">▸</span>
+    </button>
+    <div class="guidelines-body" id="guidelinesBody">
+
+      <div class="gl-entry">
+        <div class="gl-name">AMA</div>
+        <div class="gl-detail">≥35 years old at delivery · start 36w · weekly</div>
+      </div>
+
+      <div class="gl-entry">
+        <div class="gl-name">Oligohydramnios</div>
+        <div class="gl-detail">MVP &lt;2cm · start at diagnosis · NST + AFI 1–2×/week</div>
+      </div>
+
+      <div class="gl-entry">
+        <div class="gl-name">Polyhydramnios <span class="gl-qualifier">moderate–severe</span></div>
+        <div class="gl-detail">MVP ≥12 or AFI ≥30 · start 32–34w · 1–2×/week</div>
+      </div>
+
+      <div class="gl-entry">
+        <div class="gl-name">Cholestasis of Pregnancy</div>
+        <div class="gl-detail">If bile acids ≥40 · start at diagnosis · twice weekly</div>
+      </div>
+
+      <div class="gl-entry">
+        <div class="gl-name">Gestational DM <span class="gl-qualifier">GDMA2, medication-requiring</span></div>
+        <div class="gl-detail">Start 32w · twice weekly</div>
+      </div>
+
+      <div class="gl-entry">
+        <div class="gl-name">Pre-gestational DM <span class="gl-qualifier">T2DM</span></div>
+        <div class="gl-detail">Start 32w · twice weekly</div>
+      </div>
+
+      <div class="gl-entry">
+        <div class="gl-name">FGR / IUGR</div>
+        <div class="gl-sub-entries">
+          <div class="gl-sub">
+            <span class="gl-sub-label">3rd–9th %ile, normal doppler</span>
+            <span class="gl-sub-detail">Time of Dx · weekly</span>
+          </div>
+          <div class="gl-sub gl-sub-warn">
+            <span class="gl-sub-label">&lt;3rd %ile or abnormal doppler</span>
+            <span class="gl-sub-detail">Refer to MFM</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="gl-entry">
+        <div class="gl-name">Hypertension</div>
+        <div class="gl-sub-entries">
+          <div class="gl-sub">
+            <span class="gl-sub-label">Chronic, well controlled</span>
+            <span class="gl-sub-detail">32w · once weekly</span>
+          </div>
+          <div class="gl-sub">
+            <span class="gl-sub-label">Chronic, poor control</span>
+            <span class="gl-sub-detail">32w · twice weekly</span>
+          </div>
+          <div class="gl-sub">
+            <span class="gl-sub-label">Gestational HTN</span>
+            <span class="gl-sub-detail">Time of Dx · twice weekly</span>
+          </div>
+          <div class="gl-sub">
+            <span class="gl-sub-label">Pre-eclampsia</span>
+            <span class="gl-sub-detail">Time of Dx · twice weekly</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="gl-entry">
+        <div class="gl-name">Obesity</div>
+        <div class="gl-sub-entries">
+          <div class="gl-sub">
+            <span class="gl-sub-label">Pre-pregnancy BMI 35–39 kg/m²</span>
+            <span class="gl-sub-detail">37w · weekly</span>
+          </div>
+          <div class="gl-sub">
+            <span class="gl-sub-label">Pre-pregnancy BMI ≥40 kg/m²</span>
+            <span class="gl-sub-detail">34w · weekly</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="gl-entry">
+        <div class="gl-name">Post-dates</div>
+        <div class="gl-sub-entries">
+          <div class="gl-sub">
+            <span class="gl-sub-label">41 weeks</span>
+            <span class="gl-sub-detail">Twice weekly</span>
+          </div>
+          <div class="gl-sub">
+            <span class="gl-sub-label">42 weeks</span>
+            <span class="gl-sub-detail">Every other day</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="gl-entry">
+        <div class="gl-name">Prior IUFD</div>
+        <div class="gl-detail">Start 2 weeks before GA of earliest prior loss · NST twice weekly · AFI once weekly</div>
+      </div>
+
+      <div class="gl-disclaimer">These are rough guidelines for educational reference only. Clinical decisions should be individualized and made in consultation with a qualified provider.</div>
+
+    </div>
+  </div>
+
+  <footer class="page-footer">
+    <span>v2 · 2026-03-24</span>
+  </footer>
+
+</div>
+<script>
+  // ── State ──────────────────────────────────────────────────────────────────
+  let lmpDate   = null;
+  let riskMode  = 'avg';
+  let activeField = null; // 'lmp' | 'ga' | 'edd'
+
+  // Antenatal testing state: key → { active: bool, diagGaDays: null|number }
+  const antState = {};
+
+  const ANT_LABELS = {
+    ama:       'AMA',
+    gdm:       'GDM',
+    dm_pregest:'Pre-gestational DM',
+    htn:       'Hypertension',
+    iugr:      'IUGR / FGR',
+    ob2:       'Obesity BMI 35–39',
+    ob3:       'Obesity BMI ≥40',
+    oligo:     'Oligohydramnios',
+    prior_iufd:'Prior IUFD',
+  };
+
+  // NST+AFI start week by indication.
+  // Fixed number = start at that GA week.
+  // 'oligo' = start from current GA week (today onward).
+  // 'prior_iufd' = start 2w before GA of prior loss (entered by user).
+  const ANT_START_WEEK = {
+    ama:       36,
+    gdm:       32,
+    dm_pregest:32,
+    htn:       32,
+    iugr:      32,   // reasonable default if no diag date; overridden by diag
+    ob2:       37,
+    ob3:       34,
+    oligo:     'current',
+    prior_iufd:'iufd_minus2',
+  };
+
+  // Keys that show a diagnosis date input
+  const ANT_NEEDS_DATE = new Set(['prior_iufd']);
+
+  const DAYS  = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+  // ── Helpers ────────────────────────────────────────────────────────────────
+  function addDays(d, n)  { const r = new Date(d); r.setDate(r.getDate() + n); return r; }
+  function dateOnly(d)    { return new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
+  function fmtFull(d)     { return `${MONTHS[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`; }
+  function fmtShort(d)    { return `${MONTHS[d.getMonth()]} ${d.getDate()}`; }
+  function fmtDow(d)      { return DAYS[d.getDay()]; }
+  function daysBetween(a,b) { return Math.round((dateOnly(b) - dateOnly(a)) / 86400000); }
+
+  function gaStr(totalDays) {
+    const w = Math.floor(totalDays / 7), d = totalDays % 7;
+    return d > 0 ? `${w}w ${d}d` : `${w}w`;
+  }
+
+  function getTrimester(weeks) {
+    if (weeks < 14) return 1;
+    if (weeks < 28) return 2;
+    return 3;
+  }
+
+  // ── Date parsing ───────────────────────────────────────────────────────────
+  function parseCalDate(str) {
+    const p = str.trim().split('/');
+    if (p.length !== 3) return null;
+    let [m, d, y] = p.map(Number);
+    if (!m || !d || !y) return null;
+    if (m < 1 || m > 12 || d < 1 || d > 31) return null;
+    if (y >= 0 && y <= 99) y += y <= 49 ? 2000 : 1900;
+    const dt = new Date(y, m-1, d);
+    if (dt.getMonth() !== m-1 || dt.getDate() !== d) return null;
+    return dt;
+  }
+
+  function parseRelDate(str) {
+    const s = str.trim().toLowerCase().replace(/\s/g,'');
+    const m = s.match(/^([twmy])(([+\-])(\d+))?$/);
+    if (!m) return null;
+    const unit = m[1], sign = m[3] === '-' ? -1 : 1;
+    const n = m[4] ? parseInt(m[4]) * sign : 0;
+    const dt = dateOnly(new Date());
+    let desc = '';
+    if      (unit==='t') { dt.setDate(dt.getDate()+n);         desc=n===0?'today':`today ${n>0?'+':''}${n}d`; }
+    else if (unit==='w') { dt.setDate(dt.getDate()+n*7);       desc=`today ${n>0?'+':''}${n}w`; }
+    else if (unit==='m') { dt.setDate(dt.getDate()+n*28);      desc=`today ${n>0?'+':''}${n}mo`; }
+    else if (unit==='y') { dt.setFullYear(dt.getFullYear()+n); desc=`today ${n>0?'+':''}${n}y`; }
+    return { date: dt, description: desc };
+  }
+
+  function resolveDate(str) {
+    if (!str) return null;
+    const cal = parseCalDate(str);
+    if (cal) return { date: cal, description: null };
+    return parseRelDate(str);
+  }
+
+  // ── GA parsing ─────────────────────────────────────────────────────────────
+  // Accepts: 32w4d, 32w 4d, 32w, 32W4D etc.
+  function parseGA(str) {
+    const s = str.trim().toLowerCase().replace(/\s/g,'');
+    const m = s.match(/^(\d+)w(?:(\d+)d?)?$/);
+    if (!m) return null;
+    const weeks = parseInt(m[1]);
+    const days  = m[2] ? parseInt(m[2]) : 0;
+    if (weeks > 44 || days > 6) return null;
+    return weeks * 7 + days; // total days GA
+  }
+
+  function fmtGA(totalDays) {
+    const w = Math.floor(totalDays / 7), d = totalDays % 7;
+    return d > 0 ? `${w}w ${d}d` : `${w}w`;
+  }
+
+  function fmtGAInput(totalDays) {
+    // Format for filling into the GA input field
+    const w = Math.floor(totalDays / 7), d = totalDays % 7;
+    return d > 0 ? `${w}w${d}d` : `${w}w`;
+  }
+
+  // ── Input ──────────────────────────────────────────────────────────────────
+  function applyAutoSlash(input, e) {
+    if (e.inputType === 'deleteContentBackward' || e.inputType === 'deleteContentForward') return;
+    const raw = input.value;
+    if (/^[twmyTWMY]/i.test(raw.trim())) return; // skip for relative expressions
+    const cursor = input.selectionStart;
+    const digits = raw.replace(/\D/g,'');
+    const parts  = raw.split('/').map(p=>p.replace(/\D/g,''));
+    const sc     = (raw.match(/\//g)||[]).length;
+    let fmt = '';
+    if (sc===0)      fmt = digits.length<=2 ? digits : digits.slice(0,2)+'/'+digits.slice(2,4);
+    else if (sc===1) { const mm=parts[0].slice(0,2),dd=parts[1]||''; fmt=dd.length<=2?mm+'/'+dd:mm+'/'+dd.slice(0,2)+'/'+dd.slice(2,6); }
+    else             fmt = parts[0].slice(0,2)+'/'+(parts[1]||'').slice(0,2)+'/'+(parts[2]||'').slice(0,4);
+    if (input.value !== fmt) {
+      const diff = fmt.length - raw.length;
+      input.value = fmt;
+      input.setSelectionRange(Math.max(0,cursor+diff), Math.max(0,cursor+diff));
+    }
+  }
+
+  function setGhost(ghostEl, raw) {
+    const r = resolveDate(raw.trim());
+    ghostEl.textContent = (r && r.description) ? `${fmtFull(r.date)} · ${r.description}` : '';
+  }
+
+  function onDateInput(e, field) {
+    activeField = field;
+    const input = e.target;
+
+    if (field === 'ga') {
+      // No auto-slash for GA field — just calculate
+      const gaDays = parseGA(input.value);
+      const gaGhost = document.getElementById('gaGhost');
+      gaGhost.textContent = gaDays !== null ? fmtGA(gaDays) : '';
+    } else {
+      applyAutoSlash(input, e);
+      setGhost(document.getElementById(field + 'Ghost'), input.value);
+    }
+    calculate();
+  }
+
+  // ── Risk ───────────────────────────────────────────────────────────────────
+  function setRisk(r) {
+    riskMode = r;
+    document.getElementById('btnAvg').classList.toggle('active', r==='avg');
+    document.getElementById('btnAvg').classList.remove('high');
+    document.getElementById('btnHigh').classList.toggle('active', r==='high');
+    document.getElementById('btnHigh').classList.toggle('high', r==='high');
+    calculate();
+  }
+
+  // ── Clinical items ────────────────────────────────────────────────────────
+  // Each entry: { week: exact GA week, OR windowStart/windowEnd for ranges,
+  //   items: [{ label, type: 'exam'|'lab'|'screen'|'vaccine'|'procedure' }] }
+  // 'window' entries float to the nearest scheduled visit within the range.
+
+  const CLINICAL_ITEMS = [
+    {
+      week: 6,
+      items: [
+        { label: 'Physical Exam',           type: 'exam' },
+        { label: 'Dating Ultrasound',        type: 'procedure' },
+        { label: 'Influenza Vaccine',        type: 'vaccine' },
+        { label: 'Prenatal Labs',            type: 'lab' },
+        { label: 'Cervical Cancer Screening',type: 'screen' },
+      ]
+    },
+    {
+      windowStart: 18, windowEnd: 22,  // anatomy US window — attach to nearest visit in range
+      items: [
+        { label: 'Anatomy Ultrasound (18–22w)', type: 'window' },
+      ]
+    },
+    {
+      week: 28,
+      items: [
+        { label: 'Diabetic Screen',    type: 'lab' },
+        { label: 'CBC',                type: 'lab' },
+        { label: 'Pertussis Vaccine',  type: 'vaccine' },
+        { label: 'Rhogam if indicated',type: 'procedure' },
+      ]
+    },
+    {
+      week: 36,
+      items: [
+        { label: 'Group B Strep',         type: 'lab' },
+        { label: 'Assess Presentation',   type: 'exam' },
+      ]
+    },
+    {
+      week: 39,
+      items: [
+        { label: 'Cervical Exam', type: 'exam' },
+      ]
+    },
+  ];
+
+  // Map task type → pill CSS class
+  const TASK_TYPE_CLASS = {
+    exam:      'fixed',
+    procedure: 'fixed',
+    lab:       'fixed lab',
+    screen:    'fixed screen',
+    vaccine:   'fixed vaccine',
+    window:    'window',
+  };
+
+  // Build a lookup: visitWeek → [items]
+  // Window items attach to the closest scheduled visit within their range.
+  function buildTaskMap(schedWeeks) {
+    const map = {};
+    schedWeeks.forEach(w => map[w] = []);
+
+    CLINICAL_ITEMS.forEach(entry => {
+      if (entry.week !== undefined) {
+        // Fixed — attach to exact week if it's scheduled, else nearest scheduled week
+        const target = nearestWeek(schedWeeks, entry.week);
+        if (target !== null) map[target].push(...entry.items);
+      } else {
+        // Window — find all scheduled visits within the window
+        const inRange = schedWeeks.filter(w => w >= entry.windowStart && w <= entry.windowEnd);
+        if (inRange.length > 0) {
+          // Attach to the first scheduled visit in range
+          map[inRange[0]].push(...entry.items);
+        } else {
+          // No visit in range — attach to nearest
+          const target = nearestWeek(schedWeeks, Math.round((entry.windowStart + entry.windowEnd) / 2));
+          if (target !== null) map[target].push(...entry.items);
+        }
+      }
+    });
+
+    return map;
+  }
+
+  function nearestWeek(schedWeeks, target) {
+    if (!schedWeeks.length) return null;
+    return schedWeeks.reduce((best, w) =>
+      Math.abs(w - target) < Math.abs(best - target) ? w : best
+    );
+  }
+
+  // ── Generate visit weeks ───────────────────────────────────────────────────
+  function visitWeeks(mode) {
+    const v = [];
+    if (mode === 'avg') {
+      // First visit 6w, then every 6w through 28w
+      for (let w=6; w<=28; w+=6) v.push(w);
+      // 28–36w every 4w (start after last pushed)
+      for (let w=v[v.length-1]+4; w<=36; w+=4) v.push(w);
+      // 36w+ every 1w to 41w
+      for (let w=v[v.length-1]+1; w<=41; w+=1) v.push(w);
+    } else {
+      // High-risk: 6w first, every 4w to 28w
+      for (let w=6; w<=28; w+=4) v.push(w);
+      // 28–36w every 2w
+      for (let w=v[v.length-1]+2; w<=36; w+=2) v.push(w);
+      // 36w+ weekly to 41w
+      for (let w=v[v.length-1]+1; w<=41; w+=1) v.push(w);
+    }
+    return [...new Set(v)].sort((a,b)=>a-b);
+  }
+
+  // ── Antenatal Testing ──────────────────────────────────────────────────────
+  let antSectionOpen = false;
+
+  function toggleAntSection() {
+    antSectionOpen = !antSectionOpen;
+    document.querySelector('.ant-section').classList.toggle('open', antSectionOpen);
+    document.getElementById('antCollapseArrow').style.transform = antSectionOpen ? 'rotate(90deg)' : '';
+    if (antSectionOpen) document.getElementById('antCollapseMeta').textContent = '';
+    else updateAntMeta();
+  }
+
+  function updateAntMeta() {
+    if (antSectionOpen) return;
+    const active = Object.keys(antState).filter(k => antState[k].active);
+    const meta = document.getElementById('antCollapseMeta');
+    if (!meta) return;
+    meta.textContent = active.length
+      ? active.map(k => ANT_LABELS[k]).join(' · ')
+      : 'tap to expand';
+  }
+
+  function toggleAnt(key) {
+    if (!antState[key]) antState[key] = { active: false, diagGaDays: null };
+    antState[key].active = !antState[key].active;
+    document.querySelector(`.ant-btn[data-key="${key}"]`).classList.toggle('active', antState[key].active);
+    updateAntMeta();
+    renderAntDiagFields();
+    calculate();
+  }
+
+  function renderAntDiagFields() {
+    const container = document.getElementById('antDiagFields');
+    const activeKeys = Object.keys(antState).filter(k => antState[k].active);
+    // Only prior_iufd needs a date field
+    const dateKeys = activeKeys.filter(k => ANT_NEEDS_DATE.has(k));
+    if (!dateKeys.length) { container.innerHTML = ''; return; }
+
+    let html = '<div style="margin-top:0.65rem;">';
+    dateKeys.forEach(key => {
+      const savedVal = antState[key].diagRaw || '';
+      html += `
+        <div class="ant-diag-row">
+          <span class="ant-diag-name">${ANT_LABELS[key]}</span>
+          <div class="ant-diag-field">
+            <label>GA at prior loss <span class="field-note">e.g. 34w</span></label>
+            <input type="text" placeholder="34w  or  34w2d"
+              maxlength="20" autocomplete="off"
+              value="${savedVal}"
+              oninput="onAntDiagInput(event,'${key}')">
+            <div class="ant-diag-ghost" id="antGhost_${key}"></div>
+          </div>
+          <span style="font-family:'DM Mono',monospace;font-size:0.58rem;color:var(--muted);white-space:nowrap;">NST+AFI from 2w before loss GA</span>
+        </div>`;
+    });
+    html += '</div>';
+    container.innerHTML = html;
+
+    dateKeys.forEach(key => {
+      if (antState[key].diagRaw) updateAntGhost(key, antState[key].diagRaw);
+    });
+  }
+
+  function onAntDiagInput(e, key) {
+    const raw = e.target.value;
+    antState[key].diagRaw = raw;
+    updateAntGhost(key, raw);
+    calculate();
+  }
+
+  function updateAntGhost(key, raw) {
+    const ghostEl = document.getElementById(`antGhost_${key}`);
+    if (!ghostEl) return;
+    const gaDays = parseGA(raw.trim());
+    if (gaDays !== null) {
+      const startWk = Math.max(0, Math.floor(gaDays / 7) - 2);
+      ghostEl.textContent = `Loss at ${fmtGA(gaDays)} → testing from ${startWk}w`;
+      antState[key].diagGaDays = gaDays;
+      return;
+    }
+    ghostEl.textContent = '';
+    antState[key].diagGaDays = null;
+  }
+
+  // Compute NST start week for a given indication
+  function antNstStartWeek(key, currentWeeksGA) {
+    const rule = ANT_START_WEEK[key];
+    if (rule === 'current') return currentWeeksGA;
+    if (rule === 'iufd_minus2') {
+      const diagDays = antState[key] && antState[key].diagGaDays;
+      if (diagDays !== null && diagDays !== undefined) {
+        return Math.max(0, Math.floor(diagDays / 7) - 2);
+      }
+      return 32; // fallback if no date entered
+    }
+    // Fixed week number
+    return rule;
+  }
+
+  // ── Main calculation ───────────────────────────────────────────────────────
+  function calculate() {
+    const lmpInput = document.getElementById('lmpInput');
+    const gaInput  = document.getElementById('gaInput');
+    const eddInput = document.getElementById('eddInput');
+    const results  = document.getElementById('results');
+
+    const lmpRaw = lmpInput.value.trim();
+    const gaRaw  = gaInput.value.trim();
+    const eddRaw = eddInput.value.trim();
+
+    let lmp = null, edd = null, source = null;
+    const today = dateOnly(new Date());
+
+    // Determine driver — whichever was last edited, or first populated
+    const driver = activeField ||
+      (lmpRaw ? 'lmp' : gaRaw ? 'ga' : eddRaw ? 'edd' : null);
+
+    if (driver === 'lmp' && lmpRaw) {
+      const r = resolveDate(lmpRaw);
+      if (r) { lmp = r.date; edd = addDays(lmp, 280); source = 'lmp'; }
+    } else if (driver === 'ga' && gaRaw) {
+      const gaDays = parseGA(gaRaw);
+      if (gaDays !== null) {
+        lmp = addDays(today, -gaDays);
+        edd = addDays(lmp, 280);
+        source = 'ga';
+      }
+    } else if (driver === 'edd' && eddRaw) {
+      const r = resolveDate(eddRaw);
+      if (r) { edd = r.date; lmp = addDays(edd, -280); source = 'edd'; }
+    }
+
+    // Clear field styling
+    [lmpInput, gaInput, eddInput].forEach(el => el.classList.remove('driver','derived'));
+
+    if (!lmp || !edd) { results.classList.remove('visible'); return; }
+
+    // Fill derived fields
+    const lmpFmt = `${String(lmp.getMonth()+1).padStart(2,'0')}/${String(lmp.getDate()).padStart(2,'0')}/${lmp.getFullYear()}`;
+    const eddFmt = `${String(edd.getMonth()+1).padStart(2,'0')}/${String(edd.getDate()).padStart(2,'0')}/${edd.getFullYear()}`;
+    const daysGA = daysBetween(lmp, today);
+    const gaFmt  = fmtGAInput(Math.max(0, daysGA));
+
+    if (source === 'lmp') {
+      lmpInput.classList.add('driver');
+      if (document.activeElement !== eddInput) { eddInput.value = eddFmt; document.getElementById('eddGhost').textContent = ''; }
+      if (document.activeElement !== gaInput)  { gaInput.value  = gaFmt;  document.getElementById('gaGhost').textContent  = ''; }
+      eddInput.classList.add('derived'); gaInput.classList.add('derived');
+    } else if (source === 'ga') {
+      gaInput.classList.add('driver');
+      if (document.activeElement !== lmpInput) { lmpInput.value = lmpFmt; document.getElementById('lmpGhost').textContent = ''; }
+      if (document.activeElement !== eddInput) { eddInput.value = eddFmt; document.getElementById('eddGhost').textContent = ''; }
+      lmpInput.classList.add('derived'); eddInput.classList.add('derived');
+    } else {
+      eddInput.classList.add('driver');
+      if (document.activeElement !== lmpInput) { lmpInput.value = lmpFmt; document.getElementById('lmpGhost').textContent = ''; }
+      if (document.activeElement !== gaInput)  { gaInput.value  = gaFmt;  document.getElementById('gaGhost').textContent  = ''; }
+      lmpInput.classList.add('derived'); gaInput.classList.add('derived');
+    }
+
+    if (daysGA < 0 || daysGA > 308) { results.classList.remove('visible'); return; }
+
+    lmpDate = lmp;
+
+    // Re-evaluate any ant diag date ghosts now that LMP is known
+    Object.keys(antState).forEach(key => {
+      if (antState[key].active && antState[key].diagRaw) updateAntGhost(key, antState[key].diagRaw);
+    });
+
+    results.classList.add('visible');
+
+    const weeksGA   = Math.floor(daysGA / 7);
+    const daysRem   = daysBetween(today, edd);
+    const pct       = Math.min(1, Math.max(0, daysGA / 280));
+
+    // ── EDD banner ────────────────────────────────────────────────────────
+    const daysRemStr = daysRem > 0 ? `${daysRem} days to EDD`
+      : daysRem === 0 ? 'EDD is today'
+      : `${Math.abs(daysRem)} days past EDD`;
+
+    document.getElementById('eddBanner').innerHTML = `
+      <div class="edd-block">
+        <span class="edd-label">EDD (LMP + 280d)${source==='edd'?' · entered':'· calculated'}</span>
+        <span class="edd-value">${fmtShort(edd)}, ${edd.getFullYear()}</span>
+        <span class="edd-sub">${fmtDow(edd)}</span>
+      </div>
+      <div class="edd-divider"></div>
+      <div class="edd-block">
+        <span class="edd-label">Gestational Age${source==='ga'?' · entered':'· calculated'}</span>
+        <span class="edd-value" style="color:var(--ink)">${fmtGA(daysGA)}</span>
+        <span class="edd-sub">${daysRemStr}</span>
+      </div>
+      <div class="edd-divider"></div>
+      <div class="edd-block">
+        <span class="edd-label">LMP${source==='lmp'?' · entered':'· calculated'}</span>
+        <span style="font-family:'DM Mono',monospace;font-size:0.88rem;color:${source==='edd'||source==='ga'?'var(--gold)':'var(--ink)'};font-weight:500;">${fmtShort(lmp)}, ${lmp.getFullYear()}</span>
+        <span class="edd-sub">${fmtDow(lmp)}</span>
+      </div>
+    `;
+
+    // ── Progress bar ──────────────────────────────────────────────────────
+    const t1Frac = Math.min(13/40, pct);
+    const t2Frac = pct > 13/40 ? Math.min(14/40, pct - 13/40) : 0;
+    const t3Frac = pct > 27/40 ? Math.min(13/40, pct - 27/40) : 0;
+    const remFrac = Math.max(0, 1 - pct);
+
+    document.getElementById('progressWrap').innerHTML = `
+      <div class="progress-label">
+        <span>Pregnancy Progress</span>
+        <span style="color:var(--ink)">${Math.round(pct*100)}%</span>
+      </div>
+      <div class="progress-track">
+        <div class="p-t1" style="width:${t1Frac*100}%"></div>
+        <div class="p-t2" style="width:${t2Frac*100}%"></div>
+        <div class="p-t3" style="width:${t3Frac*100}%"></div>
+        <div class="p-rem" style="width:${remFrac*100}%"></div>
+        <div class="progress-now" style="left:${pct*100}%"></div>
+      </div>
+      <div class="progress-ticks">
+        <span>LMP</span><span>13w</span><span>28w</span><span>EDD (40w)</span>
+      </div>
+    `;
+
+    // ── Trimesters ────────────────────────────────────────────────────────
+    const curTri  = getTrimester(weeksGA);
+    const t1Start = lmp, t1End = addDays(lmp, 13*7-1);
+    const t2Start = addDays(lmp, 13*7), t2End = addDays(lmp, 27*7+6);
+    const t3Start = addDays(lmp, 28*7), t3End = edd;
+
+    function triCard(num, label, wkRange, start, end) {
+      const cur = curTri === num;
+      return `<div class="tri-card t${num}${cur?' current':''}">
+        <div class="tri-name">${label}</div>
+        <div class="tri-weeks">${wkRange}</div>
+        <div class="tri-dates">${fmtShort(start)}<br>– ${fmtShort(end)}</div>
+        ${cur ? `<div class="tri-tag">Current</div>` : ''}
+      </div>`;
+    }
+    document.getElementById('trimesters').innerHTML =
+      triCard(1,'1st Trimester','Wks 1–13',  t1Start, t1End) +
+      triCard(2,'2nd Trimester','Wks 14–27', t2Start, t2End) +
+      triCard(3,'3rd Trimester','Wks 28–40', t3Start, t3End);
+
+    // ── Visit schedule + NST+AFI ──────────────────────────────────────────
+    const weeks   = visitWeeks(riskMode);
+    const taskMap = buildTaskMap(weeks);
+
+    // Compute NST weeks from active antenatal indications
+    const activeAnt = Object.keys(antState).filter(k => antState[k].active);
+    let nstStartWeek = null;
+    if (activeAnt.length > 0) {
+      nstStartWeek = Math.min(...activeAnt.map(k => antNstStartWeek(k, weeksGA)));
+    }
+
+    // Add NST+AFI to taskMap for every week from nstStartWeek through last visit
+    if (nstStartWeek !== null) {
+      weeks.forEach(wk => {
+        if (wk >= nstStartWeek) {
+          if (!taskMap[wk]) taskMap[wk] = [];
+          taskMap[wk].push({ label: 'NST + AFI', type: 'nst' });
+        }
+      });
+    }
+
+    document.getElementById('schedHeader').textContent =
+      riskMode === 'avg' ? 'Prenatal Visits — Average-risk' : 'Prenatal Visits — High-risk';
+
+    let nextFound = false;
+    let html = '';
+
+    weeks.forEach(wk => {
+      const vDate    = addDays(lmp, wk * 7);
+      const dToVisit = daysBetween(today, vDate);
+      const isPast   = dToVisit < 0;
+      const isToday  = dToVisit === 0;
+      const isNext   = !isPast && !isToday && !nextFound;
+      if (isNext) nextFound = true;
+
+      const tri  = getTrimester(wk);
+      let rowCls = `visit-row tri${tri}`;
+      if (isPast)  rowCls += ' past';
+      if (isToday) rowCls += ' is-today';
+      if (isNext)  rowCls += ' is-next';
+
+      let tagHtml = '';
+      if (isToday)     tagHtml = `<span class="visit-tag-cell tag-today">Today</span>`;
+      else if (isNext) tagHtml = `<span class="visit-tag-cell tag-next">Next</span>`;
+      else if (isPast) tagHtml = `<span class="visit-tag-cell tag-past">Past</span>`;
+
+      const tasks = taskMap[wk] || [];
+      let taskHtml = '';
+      if (tasks.length) {
+        const pills = tasks.map(t =>
+          `<span class="task-pill ${t.type === 'nst' ? 'nst' : (TASK_TYPE_CLASS[t.type] || 'fixed')}">${t.label}</span>`
+        ).join('');
+        taskHtml = `<div class="task-list">${pills}</div>`;
+      }
+
+      html += `
+        <div class="${rowCls}">
+          <div class="visit-date">${fmtShort(vDate)}<span class="visit-dow">${fmtDow(vDate)}</span></div>
+          <div><span class="ga-badge">${wk}w</span></div>
+          <div class="visit-right">${tagHtml}${taskHtml}</div>
+        </div>`;
+    });
+
+    document.getElementById('visitList').innerHTML = html;
+  }
+
+  // ── Init ───────────────────────────────────────────────────────────────────
+  function init() {
+    const lmpInput = document.getElementById('lmpInput');
+    // Pre-populate with 6 weeks ago as a sensible default
+    const sixWeeksAgo = addDays(dateOnly(new Date()), -42);
+    const mm = String(sixWeeksAgo.getMonth()+1).padStart(2,'0');
+    const dd = String(sixWeeksAgo.getDate()).padStart(2,'0');
+    const yyyy = sixWeeksAgo.getFullYear();
+    lmpInput.value = `${mm}/${dd}/${yyyy}`;
+    activeField = 'lmp';
+    calculate();
+  }
+
+  function toggleGuidelines() {
+    const sec = document.querySelector('.guidelines-section');
+    sec.classList.toggle('open');
+  }
+
+  init();
+</script>
+</body>
+</html>

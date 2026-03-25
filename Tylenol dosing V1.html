@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Peds Acetaminophen Calculator</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Fredoka+One&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sky: #4FC3F7;
+    --mint: #69F0AE;
+    --coral: #FF7043;
+    --bg: #E3F2FD;
+    --card: #FFFFFF;
+    --text: #1A237E;
+    --muted: #546E7A;
+    --danger: #EF5350;
+    --shadow: 0 8px 32px rgba(26,35,126,0.10);
+    --radius: 24px;
+    --highlight: #FFF176;
+    --highlight-border: #F9A825;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    min-height: 100vh;
+    padding: 24px 16px 48px;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background:
+      radial-gradient(circle at 10% 20%, rgba(79,195,247,0.18) 0%, transparent 40%),
+      radial-gradient(circle at 85% 15%, rgba(255,213,79,0.18) 0%, transparent 35%),
+      radial-gradient(circle at 60% 80%, rgba(105,240,174,0.15) 0%, transparent 40%),
+      radial-gradient(circle at 20% 75%, rgba(206,147,216,0.15) 0%, transparent 35%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 520px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  .header {
+    text-align: center;
+    margin-bottom: 28px;
+    animation: popIn 0.5s cubic-bezier(0.34,1.56,0.64,1) both;
+  }
+
+  .pill-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 72px; height: 72px;
+    background: linear-gradient(135deg, var(--coral), #FF8A65);
+    border-radius: 50%;
+    font-size: 36px;
+    box-shadow: 0 6px 20px rgba(255,112,67,0.35);
+    margin-bottom: 12px;
+    animation: wiggle 3s ease-in-out infinite;
+  }
+
+  h1 { font-family: 'Fredoka One', cursive; font-size: 2rem; color: var(--text); letter-spacing: 0.5px; line-height: 1.1; }
+  h1 span { color: var(--coral); }
+  .subtitle { font-size: 0.9rem; color: var(--muted); margin-top: 4px; font-weight: 600; }
+
+  .card {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 28px;
+    box-shadow: var(--shadow);
+    margin-bottom: 20px;
+    animation: slideUp 0.4s ease both;
+  }
+
+  .section-label {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.1rem;
+    color: var(--text);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .section-label .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+
+  .unit-toggle {
+    display: flex;
+    background: var(--bg);
+    border-radius: 50px;
+    padding: 4px;
+    margin-bottom: 20px;
+    position: relative;
+  }
+
+  .unit-toggle input[type=radio] { display: none; }
+
+  .unit-toggle label {
+    flex: 1; text-align: center; padding: 10px 0; border-radius: 50px;
+    font-weight: 800; font-size: 0.95rem; cursor: pointer; color: var(--muted);
+    transition: color 0.2s; position: relative; z-index: 1;
+  }
+
+  .unit-toggle input:checked + label { color: white; }
+
+  .toggle-slider {
+    position: absolute; top: 4px; bottom: 4px; width: calc(50% - 4px);
+    background: linear-gradient(135deg, var(--sky), #0288D1);
+    border-radius: 50px;
+    transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    box-shadow: 0 3px 10px rgba(2,136,209,0.3); left: 4px;
+  }
+
+  #unit-lbs:checked ~ .toggle-slider { transform: translateX(calc(100%)); }
+
+  .input-row { display: flex; align-items: center; gap: 12px; }
+
+  .weight-input-wrap { position: relative; flex: 1; }
+
+  .weight-input-wrap input {
+    width: 100%; padding: 16px 60px 16px 20px;
+    border: 3px solid #E3F2FD; border-radius: 16px;
+    font-family: 'Nunito', sans-serif; font-size: 1.4rem; font-weight: 800;
+    color: var(--text); background: #F8FBFF; outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s; -moz-appearance: textfield;
+  }
+
+  .weight-input-wrap input::-webkit-inner-spin-button,
+  .weight-input-wrap input::-webkit-outer-spin-button { -webkit-appearance: none; }
+
+  .weight-input-wrap input:focus {
+    border-color: var(--sky); box-shadow: 0 0 0 4px rgba(79,195,247,0.2); background: white;
+  }
+
+  .unit-badge {
+    position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+    font-weight: 800; font-size: 0.85rem; color: var(--sky);
+    background: #E1F5FE; padding: 4px 8px; border-radius: 8px;
+  }
+
+  .calc-btn {
+    padding: 16px 24px;
+    background: linear-gradient(135deg, var(--mint), #00BCD4);
+    border: none; border-radius: 16px;
+    font-family: 'Fredoka One', cursive; font-size: 1rem; color: white;
+    cursor: pointer; box-shadow: 0 4px 15px rgba(0,188,212,0.35);
+    transition: transform 0.15s, box-shadow 0.15s; white-space: nowrap; letter-spacing: 0.5px;
+  }
+
+  .calc-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,188,212,0.45); }
+  .calc-btn:active { transform: scale(0.97); }
+
+  .conc-row { margin-bottom: 16px; }
+
+  .conc-label {
+    font-size: 0.8rem; font-weight: 800; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; display: block;
+  }
+
+  .conc-options { display: flex; gap: 8px; flex-wrap: wrap; }
+  .conc-options input[type=radio] { display: none; }
+
+  .conc-options label {
+    padding: 8px 14px; border-radius: 50px; font-size: 0.82rem; font-weight: 800;
+    cursor: pointer; border: 2px solid #E0E0E0; color: var(--muted);
+    transition: all 0.2s; background: white;
+  }
+
+  .conc-options input:checked + label {
+    background: linear-gradient(135deg, var(--sky), #0288D1);
+    border-color: var(--sky); color: white; box-shadow: 0 3px 10px rgba(79,195,247,0.35);
+  }
+
+  .error-msg {
+    display: none; background: #FFF3F3; border: 2px solid #FFCDD2;
+    border-radius: 12px; padding: 10px 14px; font-size: 0.85rem;
+    font-weight: 700; color: var(--danger); margin-top: 12px;
+  }
+  .error-msg.show { display: block; }
+
+  .results-card { display: none; animation: popIn 0.4s cubic-bezier(0.34,1.56,0.64,1) both; }
+  .results-card.show { display: block; }
+
+  .weight-display {
+    display: flex; align-items: center; gap: 10px;
+    background: linear-gradient(135deg, #E8F5E9, #F1F8E9);
+    border-radius: 16px; padding: 14px 18px; margin-bottom: 20px; border: 2px solid #C8E6C9;
+  }
+
+  .weight-display .wt-label { font-size: 0.8rem; font-weight: 800; color: #4CAF50; text-transform: uppercase; letter-spacing: 0.5px; }
+  .weight-display .wt-values { display: flex; gap: 16px; font-weight: 800; color: var(--text); font-size: 0.95rem; }
+  .weight-display .wt-sep { color: #A5D6A7; font-size: 1.2rem; }
+
+  .dose-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+
+  .dose-block { border-radius: 18px; padding: 18px 16px; text-align: center; transition: transform 0.2s; }
+  .dose-block:hover { transform: translateY(-2px); }
+  .dose-block.mg { background: linear-gradient(135deg, #EDE7F6, #D1C4E9); border: 2px solid #CE93D8; grid-column: 1 / -1; }
+  .dose-block.liquid { background: linear-gradient(135deg, #E3F2FD, #BBDEFB); border: 2px solid #90CAF9; }
+  .dose-block.tablet { background: linear-gradient(135deg, #FFF8E1, #FFECB3); border: 2px solid #FFD54F; }
+  .dose-block .block-icon { font-size: 1.6rem; display: block; margin-bottom: 6px; }
+  .dose-block .block-label { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: var(--muted); margin-bottom: 6px; }
+  .dose-block .block-value { font-family: 'Fredoka One', cursive; font-size: 2rem; color: var(--text); line-height: 1; }
+  .dose-block.mg .block-value { font-size: 2.2rem; color: #6A1B9A; }
+  .dose-block.liquid .block-value { color: #1565C0; }
+  .dose-block.tablet .block-value { color: #E65100; }
+  .dose-block .block-unit { font-size: 0.8rem; font-weight: 700; color: var(--muted); margin-top: 2px; }
+  .dose-block .block-sub { font-size: 0.72rem; font-weight: 600; color: var(--muted); margin-top: 4px; line-height: 1.3; }
+
+  .max-warn, .age-warn {
+    border-radius: 16px; padding: 12px 16px; font-size: 0.82rem;
+    font-weight: 700; margin-top: 12px; display: none; align-items: center; gap: 8px;
+  }
+  .max-warn { background: linear-gradient(135deg, #FFEBEE, #FCE4EC); border: 2px solid #EF9A9A; color: #B71C1C; }
+  .max-warn.show { display: flex; }
+  .age-warn { background: linear-gradient(135deg, #FFF3E0, #FBE9E7); border: 2px solid #FFCC80; color: #BF360C; }
+  .age-warn.show { display: flex; }
+
+  .safety-banner {
+    border-radius: 16px; padding: 14px 18px; margin-top: 14px;
+    background: linear-gradient(135deg, #FFF8E1, #FFF3E0); border: 2px solid #FFCC02;
+    display: flex; gap: 10px; align-items: flex-start;
+  }
+  .safety-banner .s-icon { font-size: 1.3rem; flex-shrink: 0; margin-top: 1px; }
+  .safety-banner .s-text { font-size: 0.82rem; font-weight: 700; color: #6D4C41; line-height: 1.5; }
+  .safety-banner .s-text strong { color: #E65100; }
+
+  .copy-section {
+    margin-top: 16px; border: 2px dashed #B0BEC5;
+    border-radius: 16px; padding: 18px; background: #F8FBFF;
+  }
+
+  .copy-label {
+    font-size: 0.78rem; font-weight: 800; text-transform: uppercase;
+    letter-spacing: 0.6px; color: var(--muted); margin-bottom: 10px;
+    display: flex; align-items: center; gap: 6px;
+  }
+
+  .copy-preview {
+    font-size: 0.88rem; font-weight: 600; color: var(--text); line-height: 1.7;
+    margin-bottom: 14px; padding: 12px 14px; background: white;
+    border-radius: 10px; border: 1px solid #E0E0E0;
+  }
+
+  .copy-preview strong { font-weight: 900; color: #1A237E; }
+
+  .copy-preview .preview-title {
+    font-family: 'Fredoka One', cursive; font-size: 1rem; color: var(--coral);
+    display: block; margin-bottom: 6px;
+  }
+
+  .copy-preview .preview-meta { font-size: 0.78rem; color: var(--muted); margin-top: 4px; display: block; }
+
+  .copy-btn {
+    width: 100%; padding: 13px; border: none; border-radius: 12px;
+    font-family: 'Fredoka One', cursive; font-size: 1rem; color: white;
+    cursor: pointer; letter-spacing: 0.5px;
+    transition: transform 0.15s, box-shadow 0.15s, background 0.3s;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+
+  .copy-btn.indigo { background: linear-gradient(135deg, #5C6BC0, #3949AB); box-shadow: 0 4px 14px rgba(57,73,171,0.3); }
+  .copy-btn.indigo:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(57,73,171,0.4); }
+  .copy-btn.green { background: linear-gradient(135deg, #43A047, #2E7D32); box-shadow: 0 4px 14px rgba(46,125,50,0.3); }
+  .copy-btn:active { transform: scale(0.97); }
+
+  /* Dosing table */
+  .table-card {
+    background: var(--card); border-radius: var(--radius);
+    padding: 28px; box-shadow: var(--shadow); margin-bottom: 20px;
+  }
+
+  .table-note {
+    font-size: 0.75rem; font-weight: 600; color: var(--muted);
+    text-align: center; margin-bottom: 14px; font-style: italic;
+  }
+
+  .dose-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; margin-bottom: 14px; }
+
+  .dose-table thead tr { background: linear-gradient(135deg, #5C6BC0, #3949AB); color: white; }
+
+  .dose-table thead th {
+    padding: 10px 12px; font-family: 'Fredoka One', cursive;
+    font-size: 0.9rem; font-weight: 400; letter-spacing: 0.3px; text-align: center;
+  }
+
+  .dose-table thead th:first-child { border-radius: 10px 0 0 10px; text-align: left; }
+  .dose-table thead th:last-child { border-radius: 0 10px 10px 0; }
+
+  .dose-table tbody tr { border-bottom: 1px solid #EEF2FF; transition: background 0.15s; }
+  .dose-table tbody tr:hover:not(.highlighted) { background: #F5F7FF; }
+
+  .dose-table tbody td { padding: 9px 12px; font-weight: 700; color: var(--text); text-align: center; }
+  .dose-table tbody td:first-child { text-align: left; color: var(--muted); font-weight: 600; }
+
+  .dose-table tbody tr.highlighted { background: var(--highlight) !important; }
+  .dose-table tbody tr.highlighted td { color: #4E342E; font-weight: 900; }
+  .dose-table tbody tr.highlighted td:first-child { color: #4E342E; }
+
+  .ml-val { font-family: 'Fredoka One', cursive; font-size: 1rem; }
+  .highlighted .ml-val {
+    background: var(--highlight-border); color: white;
+    padding: 2px 10px; border-radius: 20px; display: inline-block;
+  }
+
+  .disclaimer {
+    text-align: center; font-size: 0.75rem; font-weight: 600; color: var(--muted);
+    margin-top: 24px; line-height: 1.5; padding: 0 8px;
+  }
+
+  @keyframes popIn { from { opacity: 0; transform: scale(0.88); } to { opacity: 1; transform: scale(1); } }
+  @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes wiggle { 0%,100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); } }
+
+  @media (max-width: 380px) {
+    .dose-grid { grid-template-columns: 1fr; }
+    .dose-block.mg { grid-column: 1; }
+    h1 { font-size: 1.7rem; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <div class="pill-icon">💊</div>
+    <h1>Peds <span>Acetaminophen</span><br>Calculator</h1>
+    <p class="subtitle">Weight-Based Dosing</p>
+  </div>
+
+  <!-- Input Card -->
+  <div class="card">
+    <div class="section-label">
+      <span class="dot" style="background:var(--sky)"></span>
+      Enter Patient Weight
+    </div>
+
+    <div class="unit-toggle">
+      <input type="radio" name="unit" id="unit-kg" value="kg" checked>
+      <label for="unit-kg">Kilograms (kg)</label>
+      <input type="radio" name="unit" id="unit-lbs" value="lbs">
+      <label for="unit-lbs">Pounds (lbs)</label>
+      <div class="toggle-slider"></div>
+    </div>
+
+    <div class="conc-row">
+      <span class="conc-label">💧 Liquid Concentration</span>
+      <div class="conc-options">
+        <input type="radio" name="conc" id="conc-160" value="160" checked>
+        <label for="conc-160">160 mg/5 mL <em style="font-style:normal;opacity:0.7">(children's)</em></label>
+        <input type="radio" name="conc" id="conc-325" value="325">
+        <label for="conc-325">325 mg/5 mL <em style="font-style:normal;opacity:0.7">(extra str.)</em></label>
+      </div>
+    </div>
+
+    <div class="conc-row">
+      <span class="conc-label">💊 Dose (mg/kg)</span>
+      <div class="conc-options">
+        <input type="radio" name="doseperkg" id="dose-10" value="10">
+        <label for="dose-10">10 mg/kg <em style="font-style:normal;opacity:0.7">(low)</em></label>
+        <input type="radio" name="doseperkg" id="dose-15" value="15" checked>
+        <label for="dose-15">15 mg/kg <em style="font-style:normal;opacity:0.7">(standard)</em></label>
+      </div>
+    </div>
+
+    <div class="input-row">
+      <div class="weight-input-wrap">
+        <input type="number" id="weight-input" placeholder="0" min="1" max="200" step="0.1" inputmode="decimal">
+        <span class="unit-badge" id="unit-label">kg</span>
+      </div>
+      <button class="calc-btn" onclick="calculate()">Calculate ✨</button>
+    </div>
+
+    <div class="error-msg" id="error-msg">⚠️ Please enter a valid weight.</div>
+  </div>
+
+  <!-- Results Card -->
+  <div class="card results-card" id="results-card">
+    <div class="section-label">
+      <span class="dot" style="background:var(--mint)"></span>
+      Recommended Dose
+    </div>
+
+    <div class="weight-display">
+      <span>⚖️</span>
+      <div>
+        <div class="wt-label">Patient Weight</div>
+        <div class="wt-values" id="wt-display"></div>
+      </div>
+    </div>
+
+    <div class="dose-grid">
+      <div class="dose-block mg">
+        <span class="block-icon">💊</span>
+        <div class="block-label" id="dose-mg-label">Dose (15 mg/kg)</div>
+        <div class="block-value" id="dose-mg">—</div>
+        <div class="block-unit">mg</div>
+        <div class="block-sub" id="dose-range"></div>
+      </div>
+
+      <div class="dose-block liquid">
+        <span class="block-icon">💧</span>
+        <div class="block-label">Liquid Volume</div>
+        <div class="block-value" id="dose-ml">—</div>
+        <div class="block-unit">mL</div>
+        <div class="block-sub" id="conc-desc">at 160 mg/5 mL</div>
+      </div>
+
+      <div class="dose-block tablet">
+        <span class="block-icon">🔶</span>
+        <div class="block-label">Chewable Tabs</div>
+        <div class="block-value" id="dose-tab">—</div>
+        <div class="block-unit">× 80 mg tabs</div>
+        <div class="block-sub" id="tab-sub"></div>
+      </div>
+    </div>
+
+    <div class="max-warn" id="max-warn">
+      🚨 <span>Dose capped at <strong>1,000 mg</strong> per dose (maximum safe single dose).</span>
+    </div>
+
+    <div class="age-warn" id="age-warn">
+      👶 <span>Weight &lt; 5 kg — consult a physician before dosing infants.</span>
+    </div>
+
+    <div class="safety-banner">
+      <span class="s-icon">⏰</span>
+      <div class="s-text">
+        Give every <strong>4–6 hours</strong> as needed &nbsp;·&nbsp;
+        <strong>Max 5 doses</strong> in 24 hours &nbsp;·&nbsp;
+        Daily max: <strong id="daily-max">—</strong> mg/day<br>
+        Do not exceed <strong>75 mg/kg/day</strong> or <strong>4,000 mg/day</strong>
+      </div>
+    </div>
+
+    <div class="copy-section">
+      <div class="copy-label"><span>📋</span> Patient Instructions</div>
+      <div class="copy-preview" id="copy-preview"></div>
+      <button class="copy-btn indigo" id="instr-btn" onclick="copyInstructions()">
+        <span id="instr-btn-icon">📋</span>
+        <span id="instr-btn-text">Copy Instructions</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Dosing Table Card -->
+  <div class="table-card">
+    <div class="section-label">
+      <span class="dot" style="background:var(--coral)"></span>
+      Dosing Reference Table
+    </div>
+    <p class="table-note">Children's liquid Tylenol · 160 mg/5 mL · 15 mg/kg · Conservative dose for weight range</p>
+
+    <table class="dose-table">
+      <thead>
+        <tr>
+          <th>Weight (lbs)</th>
+          <th>Dose (mL)</th>
+          <th>Dose (mg)</th>
+        </tr>
+      </thead>
+      <tbody id="table-body"></tbody>
+    </table>
+
+    <button class="copy-btn indigo" id="table-btn" onclick="copyTable()">
+      <span id="table-btn-icon">📋</span>
+      <span id="table-btn-text">Copy Table</span>
+    </button>
+  </div>
+
+  <p class="disclaimer">
+    For clinical reference only. Always verify dosing with current guidelines.<br>
+    Not a substitute for clinical judgment or pharmacist consultation.
+  </p>
+
+</div>
+<script>
+  // ── Dosing table (15 mg/kg, 160 mg/5 mL, rounded to nearest 0.5 mL, never exceeding 15 mg/kg) ──
+  const DOSE_TABLE = [
+    {lo:6,  hi:11,  ml:1.25, mg:40,  label:'6–11 lbs'},
+    {lo:12, hi:17,  ml:2.5,  mg:80,  label:'12–17 lbs'},
+    {lo:18, hi:23,  ml:3.75, mg:120, label:'18–23 lbs'},
+    {lo:24, hi:34,  ml:5.0,  mg:160, label:'24–34 lbs'},
+    {lo:35, hi:46,  ml:7.5,  mg:240, label:'35–46 lbs'},
+    {lo:47, hi:58,  ml:10.0, mg:320, label:'47–58 lbs'},
+    {lo:59, hi:70,  ml:12.5, mg:400, label:'59–70 lbs'},
+    {lo:71, hi:null, ml:15.0, mg:480, label:'71+ lbs'},
+  ];
+
+  // Build table rows
+  (function() {
+    const tbody = document.getElementById('table-body');
+    DOSE_TABLE.forEach(function(row, i) {
+      const tr = document.createElement('tr');
+      tr.id = 'trow-' + i;
+      tr.innerHTML =
+        '<td>' + row.label + '</td>' +
+        '<td><span class="ml-val">' + row.ml.toFixed(2).replace(/\.?0+$/, '') + ' mL</span></td>' +
+        '<td>' + row.mg + ' mg</td>';
+      tbody.appendChild(tr);
+    });
+  })();
+
+  // Round to nearest 0.5 mL, never exceeding exact dose
+  function roundMl(exactMl, exactMg, concVal) {
+    var up   = Math.ceil(exactMl * 2) / 2;
+    var down = Math.floor(exactMl * 2) / 2;
+    var mgUp = (up / 5) * concVal;
+    return (mgUp <= exactMg + 0.001) ? up : down;
+  }
+
+  function round1(n) { return Math.round(n * 10) / 10; }
+
+  // Highlight matching table row
+  function highlightTableRow(lbs) {
+    document.querySelectorAll('#table-body tr').forEach(function(tr) {
+      tr.classList.remove('highlighted');
+    });
+    var idx = DOSE_TABLE.findIndex(function(r) { return lbs >= r.lo && (r.hi === null || lbs <= r.hi); });
+    if (idx >= 0) {
+      var tr = document.getElementById('trow-' + idx);
+      tr.classList.add('highlighted');
+      setTimeout(function() {
+        tr.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }, 400);
+    }
+  }
+
+  // Event listeners
+  document.querySelectorAll('input[name="unit"]').forEach(function(r) {
+    r.addEventListener('change', function() {
+      document.getElementById('unit-label').textContent = r.value;
+      document.getElementById('results-card').classList.remove('show');
+      document.querySelectorAll('#table-body tr').forEach(function(tr) {
+        tr.classList.remove('highlighted');
+      });
+    });
+  });
+
+  document.querySelectorAll('input[name="conc"], input[name="doseperkg"]').forEach(function(r) {
+    r.addEventListener('change', function() {
+      if (document.getElementById('results-card').classList.contains('show')) calculate();
+    });
+  });
+
+  document.getElementById('weight-input').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') calculate();
+  });
+
+  // Main calculate
+  function calculate() {
+    var raw       = parseFloat(document.getElementById('weight-input').value);
+    var unit      = document.querySelector('input[name="unit"]:checked').value;
+    var concVal   = parseFloat(document.querySelector('input[name="conc"]:checked').value);
+    var dosePerKg = parseFloat(document.querySelector('input[name="doseperkg"]:checked').value);
+    var errEl     = document.getElementById('error-msg');
+    var resultsCard = document.getElementById('results-card');
+
+    if (isNaN(raw) || raw <= 0 || raw > (unit === 'kg' ? 100 : 220)) {
+      errEl.classList.add('show');
+      resultsCard.classList.remove('show');
+      return;
+    }
+    errEl.classList.remove('show');
+
+    var kg  = unit === 'lbs' ? raw / 2.20462 : raw;
+    var lbs = unit === 'lbs' ? raw : raw * 2.20462;
+
+    var exactMg = kg * dosePerKg;
+    var cappedAt1000 = false;
+    if (exactMg > 1000) { exactMg = 1000; cappedAt1000 = true; }
+
+    var exactMl = (exactMg / concVal) * 5;
+    var doseMl  = roundMl(exactMl, exactMg, concVal);
+    var doseMg  = Math.round((doseMl / 5) * concVal);
+
+    var dailyMaxMg   = Math.min(kg * 75, 4000);
+    var doseRangeLow = Math.round(Math.min(kg * 10, 1000));
+
+    // Weight display
+    document.getElementById('wt-display').innerHTML =
+      '<span>' + round1(kg) + ' kg</span>' +
+      '<span class="wt-sep">\u00b7</span>' +
+      '<span>' + round1(lbs) + ' lbs</span>';
+
+    // mg block
+    document.getElementById('dose-mg-label').textContent = 'Dose (' + dosePerKg + ' mg/kg)';
+    document.getElementById('dose-mg').textContent = doseMg;
+    document.getElementById('dose-range').textContent =
+      dosePerKg === 10
+        ? 'standard range: 10\u201315 mg/kg'
+        : 'range: ' + doseRangeLow + '\u2013' + doseMg + ' mg';
+
+    // liquid block
+    document.getElementById('dose-ml').textContent = doseMl.toFixed(1);
+    document.getElementById('conc-desc').textContent = 'at ' + concVal + ' mg/5 mL';
+
+    // tablet block
+    var tabsExact  = doseMg / 80;
+    var tabsFloor  = Math.floor(tabsExact);
+    var tabsRound  = Math.round(tabsExact);
+    if (tabsRound === 0) {
+      document.getElementById('dose-tab').textContent = '<1';
+      document.getElementById('tab-sub').textContent = 'Consider liquid only';
+    } else {
+      document.getElementById('dose-tab').textContent =
+        tabsFloor !== tabsRound ? tabsFloor + '\u2013' + (tabsFloor + 1) : '' + tabsFloor;
+      document.getElementById('tab-sub').textContent = '= ' + (tabsRound * 80) + ' mg total';
+    }
+
+    document.getElementById('daily-max').textContent = Math.round(dailyMaxMg);
+    document.getElementById('max-warn').classList.toggle('show', cappedAt1000);
+    document.getElementById('age-warn').classList.toggle('show', kg < 5);
+
+    resultsCard.classList.add('show');
+    resultsCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+    updateCopyPreview(doseMl.toFixed(1), doseMg, round1(kg), round1(lbs), concVal);
+    highlightTableRow(Math.round(lbs));
+  }
+
+  // Patient instructions preview
+  function updateCopyPreview(ml, mg, kg, lbs, concVal) {
+    var concStr = concVal === 160 ? '160 mg/5 mL' : '325 mg/5 mL';
+    document.getElementById('copy-preview').innerHTML =
+      '<span class="preview-title">Acetaminophen Dosing Instructions</span>' +
+      'Give <strong>' + ml + ' mL</strong> of children\'s liquid Tylenol (acetaminophen ' + concStr + ') by mouth every 4\u20136 hours as needed for fever, pain, or fussiness.' +
+      '<span class="preview-meta">(' + mg + ' mg \u00b7 based on weight of ' + kg + ' kg / ' + lbs + ' lbs)</span>' +
+      '<span class="preview-meta">Do not give more than 5 doses in 24 hours. Do not exceed the recommended dose.</span>';
+  }
+
+  function copyInstructions() {
+    var ml      = document.getElementById('dose-ml').textContent;
+    var mg      = document.getElementById('dose-mg').textContent;
+    var wtEl    = document.getElementById('wt-display');
+    var kg      = wtEl ? wtEl.children[0].textContent : '?';
+    var lbs     = wtEl ? wtEl.children[2].textContent : '?';
+    var concVal = parseFloat(document.querySelector('input[name="conc"]:checked').value);
+    var concStr = concVal === 160 ? '160 mg/5 mL' : '325 mg/5 mL';
+
+    var text =
+      'Acetaminophen Dosing Instructions\n\n' +
+      'Give ' + ml + ' mL of children\'s liquid Tylenol (acetaminophen ' + concStr + ') by mouth every 4\u20136 hours as needed for fever, pain, or fussiness.\n\n' +
+      '(' + mg + ' mg \u00b7 based on weight of ' + kg + ' / ' + lbs + ')\n\n' +
+      'Do not give more than 5 doses in 24 hours. Do not exceed the recommended dose.';
+
+    clipCopy(text, 'instr-btn', 'instr-btn-icon', 'instr-btn-text', 'Copy Instructions');
+  }
+
+  function copyTable() {
+    var header  = "Children\'s Liquid Tylenol (acetaminophen 160 mg/5 mL) \u2014 Dosing by Weight\n";
+    header     += "15 mg/kg \u00b7 Do not exceed 5 doses in 24 hours\n\n";
+    var cols    = "Weight (lbs)\t\tDose (mL)\tDose (mg)\n";
+    var divider = "\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\n";
+    var rows    = DOSE_TABLE.map(function(r) {
+      var mlStr = r.ml.toFixed(2).replace(/\.?0+$/, '');
+      return r.label + '\t\t' + mlStr + ' mL\t\t' + r.mg + ' mg';
+    }).join('\n');
+
+    clipCopy(header + cols + divider + rows, 'table-btn', 'table-btn-icon', 'table-btn-text', 'Copy Table');
+  }
+
+  function clipCopy(text, btnId, iconId, textId, resetLabel) {
+    navigator.clipboard.writeText(text).then(function() {
+      var btn = document.getElementById(btnId);
+      document.getElementById(iconId).textContent = '\u2705';
+      document.getElementById(textId).textContent = 'Copied!';
+      btn.classList.remove('indigo');
+      btn.classList.add('green');
+      setTimeout(function() {
+        document.getElementById(iconId).textContent = '\ud83d\udccb';
+        document.getElementById(textId).textContent = resetLabel;
+        btn.classList.remove('green');
+        btn.classList.add('indigo');
+      }, 2500);
+    }).catch(function() {
+      alert('Copy failed \u2014 please select and copy the text manually.');
+    });
+  }
+</script>
+</body>
+</html>

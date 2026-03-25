@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dose Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:       #0f1923;
+    --surface:  #172130;
+    --card:     #1e2d3d;
+    --border:   #2a3f54;
+    --ink:      #e8edf2;
+    --muted:    #6b8299;
+    --accent:   #3b9eff;
+    --given:    #1a3a2a;
+    --given-border: #2d6b4a;
+    --given-dot:#3dba72;
+    --remaining:#1a2c3d;
+    --remaining-border: #2a4a6b;
+    --remaining-dot: #3b9eff;
+    --end:      #3d2a1a;
+    --end-border:#7a4a2a;
+    --end-dot:  #f0a050;
+    --danger:   #e05a5a;
+    --gold:     #f0c060;
+    --rule:     #1e2d3d;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    background-image: radial-gradient(ellipse at 60% 0%, #1a2d42 0%, #0f1923 60%);
+    min-height: 100vh;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--ink);
+    padding: 2rem 1rem 4rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .page { width: 100%; max-width: 760px; }
+
+  /* ── Masthead ── */
+  .masthead {
+    text-align: center;
+    padding: 1.5rem 0 1.75rem;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+  }
+
+  .masthead::before, .masthead::after {
+    content: '✦';
+    position: absolute;
+    top: 50%; transform: translateY(-60%);
+    color: var(--accent);
+    font-size: 0.8rem;
+    opacity: 0.6;
+  }
+  .masthead::before { left: 0; }
+  .masthead::after  { right: 0; }
+
+  .kicker {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.4rem;
+  }
+
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(1.8rem, 5vw, 2.6rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    color: var(--ink);
+  }
+
+  h1 span { color: var(--accent); }
+
+  /* ── Section ── */
+  .section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .section-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .step-num {
+    background: var(--accent);
+    color: var(--bg);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.55rem;
+    font-weight: 500;
+    width: 1.2rem;
+    height: 1.2rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  /* ── Frequency buttons ── */
+  .freq-buttons {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.6rem;
+  }
+
+  .freq-btn {
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 0.75rem 0.5rem 0.6rem;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.15s;
+    position: relative;
+  }
+
+  .freq-btn:hover {
+    border-color: var(--accent);
+    color: var(--ink);
+  }
+
+  .freq-btn.active {
+    background: rgba(59,158,255,0.12);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .freq-label {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    display: block;
+    line-height: 1;
+    margin-bottom: 0.25rem;
+  }
+
+  .freq-sub {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.08em;
+    display: block;
+    opacity: 0.7;
+  }
+
+  .freq-dots {
+    display: flex;
+    justify-content: center;
+    gap: 3px;
+    margin-top: 0.4rem;
+  }
+
+  .freq-dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.4;
+  }
+
+  .freq-btn.active .freq-dot { opacity: 1; }
+
+  /* ── Duration chips ── */
+  .duration-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+  }
+
+  .dur-chip {
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 0.4rem 0.85rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.78rem;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+
+  .dur-chip:hover { border-color: var(--accent); color: var(--ink); }
+  .dur-chip.active {
+    background: rgba(59,158,255,0.12);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .dur-custom {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .dur-custom input {
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--ink);
+    padding: 0.4rem 0.6rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.78rem;
+    width: 4.5rem;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  .dur-custom input:focus { border-color: var(--accent); }
+  .dur-custom input::placeholder { color: var(--muted); }
+
+  .dur-custom label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+  }
+
+  /* ── Optional start date row ── */
+  .optional-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: flex-end;
+  }
+
+  .opt-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  .opt-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .opt-field input[type="text"] {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-bottom: 2px solid var(--border);
+    color: var(--ink);
+    padding: 0.4rem 0.6rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.85rem;
+    width: 10rem;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  .opt-field input:focus { border-bottom-color: var(--accent); }
+  .opt-field input::placeholder { color: var(--muted); opacity: 0.5; }
+
+  .dose-time-btns {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+  }
+
+  .dose-time-btn {
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 0.35rem 0.65rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .dose-time-btn:hover { border-color: var(--accent); color: var(--ink); }
+  .dose-time-btn.active {
+    background: rgba(59,158,255,0.12);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .opt-clear {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    color: var(--muted);
+    cursor: pointer;
+    padding: 0.35rem 0;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    opacity: 0.6;
+    transition: opacity 0.15s;
+    white-space: nowrap;
+    align-self: flex-end;
+  }
+  .opt-clear:hover { opacity: 1; }
+
+  /* ── Grid section ── */
+  .grid-section {
+    display: none;
+  }
+  .grid-section.visible { display: block; }
+
+  .grid-scroll {
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+  }
+
+  .dose-grid {
+    border-collapse: collapse;
+    min-width: 100%;
+  }
+
+  .dose-grid th {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 0 0.4rem 0.5rem;
+    text-align: center;
+    white-space: nowrap;
+    font-weight: 400;
+  }
+
+  .dose-grid th.day-col {
+    text-align: left;
+    padding-left: 0;
+    min-width: 3.5rem;
+  }
+
+  .dose-cell {
+    width: 42px;
+    height: 42px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    cursor: pointer;
+    transition: all 0.12s;
+    position: relative;
+    vertical-align: middle;
+    text-align: center;
+  }
+
+  .dose-cell:hover { border-color: var(--accent); z-index: 1; }
+
+  .dose-cell.given {
+    background: var(--given);
+    border-color: var(--given-border);
+  }
+
+  .dose-cell.remaining {
+    background: var(--remaining);
+    border-color: var(--remaining-border);
+  }
+
+  .dose-cell.last-given {
+    background: var(--given);
+    border-color: var(--given-dot);
+    box-shadow: inset 0 0 0 2px var(--given-dot);
+  }
+
+  .dose-cell.end-day {
+    background: var(--end);
+    border-color: var(--end-border);
+  }
+
+  .dose-cell-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    gap: 2px;
+    pointer-events: none;
+  }
+
+  .cell-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+  }
+
+  .dose-cell.given .cell-dot    { background: var(--given-dot); }
+  .dose-cell.remaining .cell-dot { background: var(--remaining-dot); opacity: 0.5; }
+  .dose-cell.end-day .cell-dot  { background: var(--end-dot); }
+  .dose-cell.last-given .cell-dot { background: var(--given-dot); }
+
+  .cell-time {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.52rem;
+    color: var(--muted);
+    letter-spacing: 0.03em;
+  }
+
+  .dose-cell.given .cell-time    { color: var(--given-dot); opacity: 0.8; }
+  .dose-cell.remaining .cell-time { color: var(--remaining-dot); opacity: 0.6; }
+  .dose-cell.end-day .cell-time  { color: var(--end-dot); opacity: 0.8; }
+
+  .day-label-cell {
+    vertical-align: middle;
+    padding-right: 0.75rem;
+  }
+
+  .day-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  .day-label .day-num {
+    font-size: 0.78rem;
+    color: var(--ink);
+    font-weight: 500;
+  }
+
+  .day-label .day-date {
+    font-size: 0.56rem;
+    color: var(--muted);
+    display: block;
+    margin-top: 1px;
+  }
+
+  /* ── Summary ── */
+  .summary {
+    display: none;
+    margin-top: 1rem;
+  }
+  .summary.visible { display: block; }
+
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 0.75rem;
+  }
+
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 0.85rem 1rem;
+    text-align: center;
+  }
+
+  .stat-card.highlight {
+    border-color: var(--accent);
+    background: rgba(59,158,255,0.07);
+  }
+
+  .stat-card.warn {
+    border-color: var(--end-border);
+    background: rgba(240,160,80,0.07);
+  }
+
+  .stat-value {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--ink);
+    line-height: 1;
+    margin-bottom: 0.25rem;
+  }
+
+  .stat-card.highlight .stat-value { color: var(--accent); }
+  .stat-card.warn .stat-value { color: var(--end-dot); }
+
+  .stat-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .end-date-line {
+    margin-top: 0.75rem;
+    background: var(--card);
+    border: 1px solid var(--end-border);
+    padding: 0.6rem 1rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--end-dot);
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .end-date-line .edl-label {
+    color: var(--muted);
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* ── Legend ── */
+  .legend {
+    display: flex;
+    gap: 1.25rem;
+    flex-wrap: wrap;
+    margin-top: 0.75rem;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+  }
+
+  .legend-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+  }
+
+  .ld-given     { background: var(--given-dot); }
+  .ld-current   { background: var(--given-dot); box-shadow: 0 0 0 2px var(--given-dot); }
+  .ld-remaining { background: var(--remaining-dot); opacity: 0.5; }
+  .ld-end       { background: var(--end-dot); }
+
+  .hint-text {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 300;
+    color: var(--muted);
+    margin-top: 0.6rem;
+    font-style: italic;
+  }
+
+  .start-ghost {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    color: transparent;
+    min-height: 1rem;
+    padding-top: 0.2rem;
+    transition: color 0.15s;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .start-ghost.active {
+    color: var(--accent);
+    opacity: 0.8;
+  }
+
+  /* ── Auto-now indicators ── */
+  .dose-cell.auto-now {
+    box-shadow: inset 0 0 0 2px var(--accent);
+  }
+
+  .now-pip {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.46rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--accent);
+    line-height: 1;
+    margin-top: 1px;
+  }
+
+  .auto-note {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--accent);
+    padding: 0.45rem 0.75rem;
+    background: rgba(59,158,255,0.08);
+    border: 1px solid rgba(59,158,255,0.25);
+    margin-bottom: 0.75rem;
+    letter-spacing: 0.04em;
+  }
+
+  .override-note {
+    color: var(--gold);
+    background: rgba(240,192,96,0.08);
+    border-color: rgba(240,192,96,0.25);
+  }
+
+  .summary-grid-inner {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 0.75rem;
+  }
+
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .grid-section.visible, .summary.visible {
+    animation: fadeUp 0.25s ease;
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 480px) {
+    .freq-buttons { grid-template-columns: repeat(2, 1fr); }
+    .section { padding: 1rem; }
+    .dose-cell { width: 36px; height: 36px; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="masthead">
+    <p class="kicker">Clinical Tool</p>
+    <h1>Dose <span>Tracker</span></h1>
+  </header>
+
+  <!-- Step 1: Frequency -->
+  <div class="section">
+    <div class="section-title"><span class="step-num">1</span> Dosing Frequency</div>
+    <div class="freq-buttons">
+      <button class="freq-btn" data-freq="1" onclick="setFreq(1)">
+        <span class="freq-label">QD</span>
+        <span class="freq-sub">Once daily</span>
+        <div class="freq-dots"><div class="freq-dot"></div></div>
+      </button>
+      <button class="freq-btn" data-freq="2" onclick="setFreq(2)">
+        <span class="freq-label">BID</span>
+        <span class="freq-sub">Twice daily</span>
+        <div class="freq-dots"><div class="freq-dot"></div><div class="freq-dot"></div></div>
+      </button>
+      <button class="freq-btn" data-freq="3" onclick="setFreq(3)">
+        <span class="freq-label">TID</span>
+        <span class="freq-sub">Three times daily</span>
+        <div class="freq-dots"><div class="freq-dot"></div><div class="freq-dot"></div><div class="freq-dot"></div></div>
+      </button>
+      <button class="freq-btn" data-freq="4" onclick="setFreq(4)">
+        <span class="freq-label">QID</span>
+        <span class="freq-sub">Four times daily</span>
+        <div class="freq-dots"><div class="freq-dot"></div><div class="freq-dot"></div><div class="freq-dot"></div><div class="freq-dot"></div></div>
+      </button>
+    </div>
+  </div>
+
+  <!-- Step 2: Duration -->
+  <div class="section">
+    <div class="section-title"><span class="step-num">2</span> Duration</div>
+    <div class="duration-row">
+      <button class="dur-chip" data-days="3"  onclick="setDuration(3)">3 days</button>
+      <button class="dur-chip" data-days="5"  onclick="setDuration(5)">5 days</button>
+      <button class="dur-chip" data-days="7"  onclick="setDuration(7)">7 days</button>
+      <button class="dur-chip" data-days="10" onclick="setDuration(10)">10 days</button>
+      <button class="dur-chip" data-days="14" onclick="setDuration(14)">14 days</button>
+      <div class="dur-custom">
+        <input type="number" id="customDays" min="1" max="365" placeholder="—" oninput="setDuration(parseInt(this.value)||0, true)">
+        <label>days</label>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 3: Optional start -->
+  <div class="section">
+    <div class="section-title"><span class="step-num">3</span> Start Date &amp; Dose <span style="opacity:.45; margin-left:.25rem;">(optional)</span></div>
+    <div class="optional-row">
+      <div class="opt-field">
+        <span class="opt-label">Start Date</span>
+        <input type="text" id="startDate" placeholder="mm/dd/yyyy or t±N" maxlength="20" autocomplete="off" oninput="onStartDateInput(event)">
+        <div class="start-ghost" id="startGhost"></div>
+      </div>
+      <div class="opt-field" id="firstDoseField" style="display:none">
+        <span class="opt-label">First Dose of Day</span>
+        <div class="dose-time-btns" id="firstDoseBtns"></div>
+      </div>
+      <span class="opt-clear" onclick="clearOptional()">✕ clear</span>
+    </div>
+  </div>
+
+  <!-- Step 4: Grid -->
+  <div class="section grid-section" id="gridSection">
+    <div class="section-title"><span class="step-num">4</span> Dose Grid — click to mark last dose given</div>
+    <div class="hint-text" id="gridHint">Click any dose cell to mark all doses up to that point as given.</div>
+    <div class="grid-scroll" style="margin-top:0.75rem">
+      <table class="dose-grid" id="doseGrid"></table>
+    </div>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot ld-given"></div>Given</div>
+      <div class="legend-item"><div class="legend-dot ld-current" style="width:10px;height:10px;border-radius:50%;background:var(--given-dot);outline:2px solid var(--given-dot);outline-offset:2px"></div>Last given</div>
+      <div class="legend-item"><div class="legend-dot ld-remaining"></div>Remaining</div>
+      <div class="legend-item"><div class="legend-dot ld-end"></div>Final day</div>
+    </div>
+  </div>
+
+  <!-- Summary -->
+  <div class="summary" id="summary">
+    <div class="section-title" style="margin-bottom:.75rem; font-family:'DM Mono',monospace; font-size:.58rem; letter-spacing:.2em; text-transform:uppercase; color:var(--muted); display:flex; gap:.5rem; align-items:center;">
+      Summary
+      <span style="flex:1;height:1px;background:var(--border);display:block"></span>
+    </div>
+    <div id="summaryGrid"></div>
+    <div class="end-date-line" id="endDateLine" style="display:none"></div>
+  </div>
+
+</div>
+
+<script>
+  // ── State ────────────────────────────────────────────────────────────────────
+  let freq         = 0;
+  let duration     = 0;
+  let lastGiven    = -1;  // courseSeq of last given dose (-1 = none)
+  let startDate    = null;
+  let firstDoseIdx = 0;
+  let isAutoNow    = false; // true when lastGiven was set automatically from current time
+
+  const DOSE_NAMES = {
+    1: ['Daily'],
+    2: ['AM', 'PM'],
+    3: ['AM', 'Noon', 'PM'],
+    4: ['AM', 'Mid', 'Eve', 'Night']
+  };
+
+  // Approximate hour boundaries for each dose slot (start of window)
+  // e.g. for TID: AM=0–11, Noon=11–17, PM=17–24
+  const DOSE_HOURS = {
+    1: [0],
+    2: [0, 13],
+    3: [0, 11, 17],
+    4: [0, 9, 14, 19]
+  };
+
+  const DAY_NAMES   = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const MONTH_NAMES = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+  // ── Helpers ──────────────────────────────────────────────────────────────────
+  function fmtDate(d) {
+    return `${DAY_NAMES[d.getDay()]} ${MONTH_NAMES[d.getMonth()]} ${d.getDate()}`;
+  }
+
+  function addDays(d, n) {
+    const r = new Date(d);
+    r.setDate(r.getDate() + n);
+    return r;
+  }
+
+  function dateOnly(d) {
+    return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  }
+
+  function parseStartDate(str) {
+    const parts = str.trim().split('/');
+    if (parts.length !== 3) return null;
+    let [m, d, y] = parts.map(Number);
+    if (!m || !d || !y) return null;
+    if (m < 1 || m > 12 || d < 1 || d > 31) return null;
+    if (y >= 0 && y <= 99) y += y <= 49 ? 2000 : 1900;
+    const dt = new Date(y, m - 1, d);
+    if (dt.getMonth() !== m - 1 || dt.getDate() !== d) return null;
+    return dt;
+  }
+
+  // Compute the courseSeq that "now" maps to, given startDate and firstDoseIdx.
+  // Returns the last dose that should have been given by now, or -1 if course hasn't started.
+  function computeAutoNow(totalDoses) {
+    if (!startDate || !freq) return -1;
+    const now      = new Date();
+    const today    = dateOnly(now);
+    const start    = dateOnly(startDate);
+    const daysDiff = Math.round((today - start) / 86400000);
+
+    if (daysDiff < 0) return -1; // course hasn't started yet
+
+    const hours    = now.getHours();
+    const thresholds = DOSE_HOURS[freq];
+
+    // Which dose slot of today have we reached or passed?
+    let todayDoseCol = -1;
+    for (let i = thresholds.length - 1; i >= 0; i--) {
+      if (hours >= thresholds[i]) { todayDoseCol = i; break; }
+    }
+
+    // Flat grid position = daysDiff * freq + todayDoseCol
+    // courseSeq = flat - firstDoseIdx
+    if (todayDoseCol < 0) {
+      // Before first dose of the day — last given was last dose of previous day
+      const prevDayLastSeq = (daysDiff - 1) * freq + (freq - 1) - firstDoseIdx;
+      return Math.max(-1, Math.min(prevDayLastSeq, totalDoses - 1));
+    }
+
+    const seq = daysDiff * freq + todayDoseCol - firstDoseIdx;
+    if (seq < 0) return -1;
+    return Math.min(seq, totalDoses - 1);
+  }
+
+  // ── Relative date parsing (same syntax as date-diff tool) ────────────────────
+  function parseRelDate(str) {
+    const s = str.trim().toLowerCase().replace(/\s/g, '');
+    const match = s.match(/^([twmy])(([+\-])(\d+))?$/);
+    if (!match) return null;
+    const unit = match[1], sign = match[3] === '-' ? -1 : 1;
+    const n = match[4] ? parseInt(match[4]) * sign : 0;
+    const base = new Date();
+    const dt   = new Date(base.getFullYear(), base.getMonth(), base.getDate());
+    let desc = '';
+    if      (unit === 't') { dt.setDate(dt.getDate() + n); desc = n===0?'today':`today ${n>0?'+':''}${n}d`; }
+    else if (unit === 'w') { dt.setDate(dt.getDate() + n*7); desc = n===0?'today':`today ${n>0?'+':''}${n}w`; }
+    else if (unit === 'm') { dt.setDate(dt.getDate() + n*28); desc = n===0?'today':`today ${n>0?'+':''}${n}mo (×28d)`; }
+    else if (unit === 'y') { dt.setFullYear(dt.getFullYear() + n); desc = n===0?'today':`today ${n>0?'+':''}${n}y`; }
+    return { date: dt, description: desc };
+  }
+
+  function resolveStartDate(str) {
+    if (!str) return null;
+    // Try calendar format first
+    const cal = parseStartDate(str);
+    if (cal) return { date: cal, description: null };
+    // Try relative format
+    const rel = parseRelDate(str);
+    if (rel) return rel;
+    return null;
+  }
+
+  // Auto-slash for date input — skips formatting for relative expressions
+  function onStartDateInput(e) {
+    const input = e.target;
+    const raw   = input.value;
+    const ghost = document.getElementById('startGhost');
+
+    if (e.inputType === 'deleteContentBackward' || e.inputType === 'deleteContentForward') {
+      updateGhost(ghost, raw);
+      updateGrid();
+      return;
+    }
+
+    // Skip auto-slash for relative expressions
+    if (/^[twmyTWMY]/i.test(raw.trim())) {
+      updateGhost(ghost, raw);
+      isAutoNow = true;
+      updateGrid();
+      return;
+    }
+
+    // Auto-slash for calendar format
+    const cursor = input.selectionStart;
+    const digits = raw.replace(/\D/g, '');
+    const parts  = raw.split('/').map(p => p.replace(/\D/g, ''));
+    const sc     = (raw.match(/\//g) || []).length;
+    let fmt = '';
+    if (sc === 0)      fmt = digits.length <= 2 ? digits : digits.slice(0,2)+'/'+digits.slice(2,4);
+    else if (sc === 1) { const m=parts[0].slice(0,2),d=parts[1]||''; fmt=d.length<=2?m+'/'+d:m+'/'+d.slice(0,2)+'/'+d.slice(2,6); }
+    else               fmt = parts[0].slice(0,2)+'/'+(parts[1]||'').slice(0,2)+'/'+(parts[2]||'').slice(0,4);
+    if (input.value !== fmt) {
+      const diff = fmt.length - raw.length;
+      input.value = fmt;
+      input.setSelectionRange(Math.max(0, cursor+diff), Math.max(0, cursor+diff));
+    }
+
+    updateGhost(ghost, input.value);
+    isAutoNow = true;
+    updateGrid();
+  }
+
+  function updateGhost(ghost, raw) {
+    if (!ghost) return;
+    const resolved = resolveStartDate(raw.trim());
+    if (resolved && resolved.description) {
+      ghost.textContent = fmtDate(resolved.date) + ' · ' + resolved.description;
+      ghost.className = 'start-ghost active';
+    } else if (resolved) {
+      ghost.textContent = '';
+      ghost.className = 'start-ghost';
+    } else {
+      ghost.textContent = raw.trim().length > 0 ? '' : '';
+      ghost.className = 'start-ghost';
+    }
+  }
+
+  // ── Controls ─────────────────────────────────────────────────────────────────
+
+  // Map firstDoseIdx from oldFreq to newFreq by relative position.
+  // Rule: preserve relative position — first→first, last→last, middle→nearest middle.
+  function mapFirstDoseIdx(oldFreq, newFreq, oldIdx) {
+    if (newFreq === 1) return 0; // QD always AM
+    if (oldFreq === 1) return 0; // coming from QD, stay at first
+    // Compute relative position as fraction 0..1
+    const rel = oldFreq > 1 ? oldIdx / (oldFreq - 1) : 0;
+    // Map to new freq
+    return Math.round(rel * (newFreq - 1));
+  }
+
+  function setFreq(f) {
+    const oldFreq = freq;
+    const oldIdx  = firstDoseIdx;
+    freq = f;
+    document.querySelectorAll('.freq-btn').forEach(b => b.classList.toggle('active', +b.dataset.freq === f));
+    // Remap firstDoseIdx intelligently before rebuilding UI
+    firstDoseIdx = mapFirstDoseIdx(oldFreq || f, f, oldIdx);
+    lastGiven = -1;
+    isAutoNow = true;
+    updateFirstDoseUI();
+    updateGrid();
+  }
+
+  function setDuration(d, isCustom) {
+    if (isCustom) {
+      document.querySelectorAll('.dur-chip').forEach(b => b.classList.remove('active'));
+    } else {
+      duration = d;
+      document.getElementById('customDays').value = '';
+      document.querySelectorAll('.dur-chip').forEach(b => b.classList.toggle('active', +b.dataset.days === d));
+    }
+    if (isCustom) duration = d;
+    lastGiven = -1;
+    isAutoNow = true;
+    updateGrid();
+  }
+
+  function updateFirstDoseUI() {
+    const field = document.getElementById('firstDoseField');
+    const btns  = document.getElementById('firstDoseBtns');
+    if (!freq || freq === 1) { field.style.display = 'none'; firstDoseIdx = 0; return; }
+    field.style.display = '';
+    const names = DOSE_NAMES[freq];
+    // Clamp firstDoseIdx to valid range for new freq (safety net)
+    firstDoseIdx = Math.max(0, Math.min(firstDoseIdx, freq - 1));
+    btns.innerHTML = names.map((n, i) => `
+      <button class="dose-time-btn${i===firstDoseIdx?' active':''}" onclick="setFirstDose(${i})">${n}</button>
+    `).join('');
+  }
+
+  function setFirstDose(i) {
+    firstDoseIdx = i;
+    document.querySelectorAll('.dose-time-btn').forEach((b, idx) => b.classList.toggle('active', idx === i));
+    lastGiven = -1;
+    isAutoNow = true;
+    updateGrid();
+  }
+
+  function clearOptional() {
+    document.getElementById('startDate').value = '';
+    const ghost = document.getElementById('startGhost');
+    if (ghost) { ghost.textContent = ''; ghost.className = 'start-ghost'; }
+    startDate = null;
+    firstDoseIdx = 0;
+    isAutoNow = false;
+    lastGiven = -1;
+    updateFirstDoseUI();
+    updateGrid();
+  }
+
+  function resetToNow() {
+    isAutoNow = true;
+    lastGiven = -1;
+    updateGrid();
+  }
+
+  // ── Grid builder ─────────────────────────────────────────────────────────────
+  function updateGrid() {
+    const raw      = document.getElementById('startDate').value;
+    const resolved = resolveStartDate(raw.trim());
+    startDate      = resolved ? resolved.date : null;
+    const section = document.getElementById('gridSection');
+
+    if (!freq || !duration) {
+      section.classList.remove('visible');
+      document.getElementById('summary').classList.remove('visible');
+      return;
+    }
+
+    section.classList.add('visible');
+
+    const totalDoses = freq * duration;
+    const gridRows   = Math.ceil((totalDoses + firstDoseIdx) / freq);
+    const names      = DOSE_NAMES[freq];
+    const table      = document.getElementById('doseGrid');
+
+    // Apply auto-now if flagged
+    if (isAutoNow) {
+      lastGiven = computeAutoNow(totalDoses);
+    }
+
+    let html = '<thead><tr><th class="day-col">Day</th>';
+    for (let c = 0; c < freq; c++) html += `<th>${names[c]}</th>`;
+    html += '</tr></thead><tbody>';
+
+    for (let row = 0; row < gridRows; row++) {
+      const dayNum = row + 1;
+      let dayLabel = `<span class="day-num">Day ${dayNum}</span>`;
+      if (startDate) {
+        const dt = addDays(startDate, row);
+        dayLabel += `<span class="day-date">${fmtDate(dt)}</span>`;
+      }
+      html += `<tr><td class="day-label-cell"><div class="day-label">${dayLabel}</div></td>`;
+
+      for (let col = 0; col < freq; col++) {
+        const seq          = row * freq + col - firstDoseIdx;
+        const isPreCourse  = seq < 0;
+        const isPostCourse = seq >= totalDoses;
+        const inCourse     = !isPreCourse && !isPostCourse;
+        const isLastRow    = Math.floor((totalDoses - 1 + firstDoseIdx) / freq) === row;
+        const isAutoCell   = isAutoNow && seq === lastGiven;
+
+        let cls = '';
+        if (inCourse) {
+          if (lastGiven >= 0 && seq <= lastGiven) {
+            cls = seq === lastGiven ? 'last-given' : 'given';
+          } else {
+            cls = isLastRow ? 'end-day' : 'remaining';
+          }
+        }
+
+        // Auto-selected cell gets a subtle "now" ring indicator
+        const autoRing = isAutoCell ? ' auto-now' : '';
+
+        html += `
+          <td class="dose-cell ${inCourse ? cls : ''}${autoRing}"
+              style="${!inCourse ? 'opacity:0.22;cursor:default;' : ''}"
+              onclick="${inCourse ? `cellClick(${seq})` : ''}">
+            <div class="dose-cell-inner">
+              <div class="cell-dot" style="${!inCourse ? 'opacity:0.2' : ''}"></div>
+              <div class="cell-time">${names[col]}</div>
+              ${isAutoCell ? '<div class="now-pip">now</div>' : ''}
+            </div>
+          </td>`;
+      }
+      html += '</tr>';
+    }
+
+    html += '</tbody>';
+    table.innerHTML = html;
+
+    updateHint(totalDoses, gridRows);
+    updateSummary(totalDoses, gridRows);
+  }
+
+  function cellClick(seq) {
+    if (seq === lastGiven && !isAutoNow) {
+      // Clicking current manual selection steps back one
+      lastGiven = seq - 1;
+    } else {
+      lastGiven = seq;
+      isAutoNow = false; // user has manually overridden
+    }
+    updateGrid();
+  }
+
+  function updateHint(totalDoses, gridRows) {
+    const hint = document.getElementById('gridHint');
+    const resetBtn = document.getElementById('resetNowBtn');
+
+    if (lastGiven < 0) {
+      if (startDate) {
+        hint.textContent = 'No doses given yet — course has not started.';
+      } else {
+        hint.textContent = 'Click any dose cell to mark all doses up to that point as given.';
+      }
+      if (resetBtn) resetBtn.style.display = 'none';
+      return;
+    }
+
+    const names   = DOSE_NAMES[freq];
+    const flatIdx = lastGiven + firstDoseIdx;
+    const row     = Math.floor(flatIdx / freq);
+    const col     = flatIdx % freq;
+    let txt;
+    if (startDate) {
+      txt = `Last dose given: ${fmtDate(addDays(startDate, row))} — ${names[col]} dose`;
+      if (isAutoNow) txt += ' (auto-detected from current date/time).';
+      else txt += '. Click the same cell to undo, or';
+    } else {
+      txt = `Last dose given: Day ${row + 1} — ${names[col]} dose.`;
+      if (!isAutoNow) txt += ' Click the same cell to undo.';
+    }
+    hint.textContent = txt;
+
+    // Show/hide reset button
+    if (resetBtn) {
+      resetBtn.style.display = (!isAutoNow && startDate) ? 'inline-block' : 'none';
+    }
+  }
+
+  function updateSummary(totalDoses, gridRows) {
+    const summaryEl = document.getElementById('summary');
+    const gridEl    = document.getElementById('summaryGrid');
+    const endLine   = document.getElementById('endDateLine');
+
+    if (lastGiven < 0 && !startDate) {
+      summaryEl.classList.remove('visible');
+      return;
+    }
+    summaryEl.classList.add('visible');
+
+    const givenCount  = lastGiven >= 0 ? lastGiven + 1 : 0;
+    const remainCount = totalDoses - givenCount;
+
+    let daysRemaining = 0;
+    if (lastGiven < totalDoses - 1) {
+      const nextSeq  = Math.max(0, lastGiven + 1);
+      const nextFlat = nextSeq + firstDoseIdx;
+      const nextRow  = Math.floor(nextFlat / freq);
+      daysRemaining  = gridRows - nextRow;
+    }
+
+    let remainToday = 0;
+    if (lastGiven >= 0) {
+      const curFlat = lastGiven + firstDoseIdx;
+      const curRow  = Math.floor(curFlat / freq);
+      const curCol  = curFlat % freq;
+      for (let c = curCol + 1; c < freq; c++) {
+        const s = curRow * freq + c - firstDoseIdx;
+        if (s >= 0 && s < totalDoses) remainToday++;
+      }
+    }
+
+    const endFlatIdx  = (totalDoses - 1) + firstDoseIdx;
+    const endRow      = Math.floor(endFlatIdx / freq);
+    const endCol      = endFlatIdx % freq;
+    const endDoseName = DOSE_NAMES[freq][endCol];
+    const endCalDate  = startDate ? addDays(startDate, endRow) : null;
+
+    const autoNote = isAutoNow && startDate
+      ? `<div class="auto-note">✦ Calculated from current date &amp; time — click any cell to override</div>`
+      : (!isAutoNow && startDate
+          ? `<div class="auto-note override-note">✎ Manually overridden — <span onclick="resetToNow()" style="cursor:pointer;text-decoration:underline;">reset to now</span></div>`
+          : '');
+
+    gridEl.innerHTML = `
+      ${autoNote}
+      <div class="summary-grid-inner">
+        <div class="stat-card">
+          <div class="stat-value">${totalDoses}</div>
+          <div class="stat-label">Total Doses</div>
+        </div>
+        <div class="stat-card${givenCount > 0 ? ' highlight' : ''}">
+          <div class="stat-value">${givenCount}</div>
+          <div class="stat-label">Doses Given</div>
+        </div>
+        <div class="stat-card${remainCount > 0 ? ' highlight' : ''}">
+          <div class="stat-value">${remainCount}</div>
+          <div class="stat-label">Doses Remaining</div>
+        </div>
+        <div class="stat-card warn">
+          <div class="stat-value">${daysRemaining}</div>
+          <div class="stat-label">Days Remaining</div>
+        </div>
+        ${remainToday > 0 ? `
+        <div class="stat-card">
+          <div class="stat-value">${remainToday}</div>
+          <div class="stat-label">More Today</div>
+        </div>` : ''}
+      </div>
+    `;
+
+    if (startDate) {
+      endLine.style.display = 'flex';
+      endLine.innerHTML = `
+        <span class="edl-label">Course ends</span>
+        <span>${fmtDate(endCalDate)} — ${endDoseName} dose &nbsp;(day ${endRow + 1})</span>
+      `;
+    } else if (firstDoseIdx > 0) {
+      endLine.style.display = 'flex';
+      endLine.innerHTML = `
+        <span class="edl-label">Course ends</span>
+        <span>Day ${endRow + 1} — ${endDoseName} dose</span>
+      `;
+    } else {
+      endLine.style.display = 'none';
+    }
+  }
+</script>
+</body>
+</html>
