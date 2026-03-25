@@ -2,6 +2,8 @@
 
 A collection of clinical and medical utility tools.
 
+> **Disclaimer:** These tools are experimental and have not been validated for clinical use. They are provided for informational and educational purposes only. Always consult a qualified healthcare provider before making any medical decisions.
+
 ## Tools
 
 | Tool | Description |
