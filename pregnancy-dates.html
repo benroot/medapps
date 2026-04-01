@@ -12,7 +12,7 @@
     --card:    #1e2d3d;
     --border:  #2a3f54;
     --ink:     #e8edf2;
-    --muted:   #8aa4bc;
+    --muted:   #9eb8d0;
     --accent:  #3b9eff;
     --gold:    #f0c060;
     --danger:  #e05a5a;
@@ -50,13 +50,13 @@
   }
   .masthead::before { content: '✦'; position: absolute; top: 50%; left: 0; transform: translateY(-50%); color: var(--accent); font-size: 0.8rem; opacity: 0.6; }
   .masthead::after  { content: '✦'; position: absolute; top: 50%; right: 0; transform: translateY(-50%); color: var(--accent); font-size: 0.8rem; opacity: 0.6; }
-  .kicker { font-family: 'DM Mono', monospace; font-size: 0.6rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.4rem; }
+  .kicker { font-family: 'DM Mono', monospace; font-size: 0.75rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.4rem; }
   h1 { font-family: 'Syne', sans-serif; font-size: clamp(1.8rem, 6vw, 2.8rem); font-weight: 800; letter-spacing: -0.02em; line-height: 1; }
 
   /* ── Section ── */
   .section { background: var(--surface); border: 1px solid var(--border); padding: 1.1rem 1.25rem; margin-bottom: 1rem; }
   .section-title {
-    font-family: 'DM Mono', monospace; font-size: 0.58rem; letter-spacing: 0.2em;
+    font-family: 'DM Mono', monospace; font-size: 0.72rem; letter-spacing: 0.2em;
     text-transform: uppercase; color: var(--muted); margin-bottom: 0.8rem;
     display: flex; align-items: center; gap: 0.5rem;
   }
@@ -64,7 +64,7 @@
 
   /* ── Input ── */
   .field { display: flex; flex-direction: column; gap: 0.3rem; }
-  label { font-family: 'DM Mono', monospace; font-size: 0.58rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); }
+  label { font-family: 'DM Mono', monospace; font-size: 0.75rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); }
   input[type="text"] {
     background: var(--card); border: 1px solid var(--border); border-bottom: 2px solid var(--border);
     padding: 0.5rem 0.65rem; font-family: 'DM Mono', monospace; font-size: 0.95rem; color: var(--ink);
@@ -74,7 +74,7 @@
   input[type="text"]:focus { border-bottom-color: var(--accent); }
 
   .ghost-preview {
-    min-height: 1.1rem; font-family: 'DM Mono', monospace; font-size: 0.6rem;
+    min-height: 1.1rem; font-family: 'DM Mono', monospace; font-size: 0.8rem;
     color: var(--accent); opacity: 1; padding-top: 0.2rem;
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
@@ -93,14 +93,14 @@
   .risk-btn.active.high { background: rgba(240,160,80,0.10); border-color: var(--amber); }
 
   .risk-btn-name {
-    font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase;
+    font-size: 0.85rem; letter-spacing: 0.1em; text-transform: uppercase;
     color: var(--muted); transition: color 0.15s;
   }
   .risk-btn.active     .risk-btn-name { color: var(--accent); }
   .risk-btn.active.high .risk-btn-name { color: var(--amber); }
 
   .risk-btn-desc {
-    font-size: 0.6rem; letter-spacing: 0.03em; line-height: 1.7;
+    font-size: 0.8rem; letter-spacing: 0.03em; line-height: 1.7;
     color: var(--muted); transition: color 0.15s;
   }
   .risk-btn.active      .risk-btn-desc { color: var(--ink); opacity: 0.75; }
@@ -111,33 +111,10 @@
   .results { display: none; }
   .results.visible { display: block; animation: fadeUp 0.3s ease; }
 
-  /* ── EDD banner ── */
-  .edd-banner {
-    background: var(--card); border: 1px solid var(--border); border-left: 3px solid var(--accent);
-    padding: 1rem 1.25rem; margin-bottom: 1rem;
-    display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;
-  }
-  .edd-block { display: flex; flex-direction: column; gap: 0.15rem; }
-  .edd-label { font-family: 'DM Mono', monospace; font-size: 0.55rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); }
-  .edd-value { font-family: 'Syne', sans-serif; font-size: 1.5rem; font-weight: 800; color: var(--accent); line-height: 1; }
-  .edd-sub { font-family: 'DM Mono', monospace; font-size: 0.6rem; color: var(--muted); }
   .edd-divider { width: 1px; height: 2.5rem; background: var(--border); flex-shrink: 0; }
 
   /* ── Progress bar ── */
-  .progress-wrap { background: var(--card); border: 1px solid var(--border); padding: 0.85rem 1.25rem; margin-bottom: 1rem; }
-  .progress-label { font-family: 'DM Mono', monospace; font-size: 0.58rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.55rem; display: flex; justify-content: space-between; }
-  .progress-track { height: 6px; background: var(--border); position: relative; display: flex; overflow: hidden; }
-  .p-t1 { background: var(--t1c); }
-  .p-t2 { background: var(--t2c); }
-  .p-t3 { background: var(--t3c); }
-  .p-rem { background: var(--border); flex: 1; }
-  .progress-now {
-    position: absolute; top: -2px; width: 2px; height: 10px;
-    background: white; opacity: 0.9; transform: translateX(-50%); z-index: 2;
-  }
-  .progress-ticks { display: flex; justify-content: space-between; margin-top: 0.35rem; font-family: 'DM Mono', monospace; font-size: 0.5rem; color: var(--muted); }
-
-  /* ── Trimesters ── */
+/* ── Trimesters ── */
   .trimesters { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.5rem; margin-bottom: 1rem; }
   .tri-card { background: var(--card); border: 1px solid var(--border); border-top: 2px solid var(--border); padding: 0.8rem 1rem; }
   .tri-card.t1 { border-top-color: var(--t1c); }
@@ -146,12 +123,12 @@
   .tri-card.current.t1 { background: rgba(59,158,255,0.06); }
   .tri-card.current.t2 { background: rgba(61,186,114,0.06); }
   .tri-card.current.t3 { background: rgba(240,160,80,0.06); }
-  .tri-name { font-family: 'DM Mono', monospace; font-size: 0.55rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.2rem; }
+  .tri-name { font-family: 'DM Mono', monospace; font-size: 0.72rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.2rem; }
   .tri-weeks { font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700; color: var(--ink); line-height: 1.2; }
-  .tri-dates { font-family: 'DM Mono', monospace; font-size: 0.56rem; color: var(--muted); margin-top: 0.25rem; line-height: 1.6; }
+  .tri-dates { font-family: 'DM Mono', monospace; font-size: 0.8rem; color: var(--muted); margin-top: 0.25rem; line-height: 1.6; }
   .tri-tag {
     display: inline-block; margin-top: 0.3rem; font-family: 'DM Mono', monospace;
-    font-size: 0.5rem; letter-spacing: 0.12em; text-transform: uppercase; padding: 0.1rem 0.4rem;
+    font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; padding: 0.1rem 0.4rem;
   }
   .t1 .tri-tag { background: rgba(59,158,255,0.15); border: 1px solid rgba(59,158,255,0.3); color: var(--t1c); }
   .t2 .tri-tag { background: rgba(61,186,114,0.15); border: 1px solid rgba(61,186,114,0.3); color: var(--t2c); }
@@ -160,7 +137,7 @@
   /* ── Visit schedule ── */
   .schedule-section { background: var(--surface); border: 1px solid var(--border); padding: 1.1rem 1.25rem; margin-bottom: 1rem; }
   .schedule-header {
-    font-family: 'DM Mono', monospace; font-size: 0.58rem; letter-spacing: 0.2em;
+    font-family: 'DM Mono', monospace; font-size: 0.72rem; letter-spacing: 0.2em;
     text-transform: uppercase; color: var(--muted); margin-bottom: 0.75rem;
     display: flex; align-items: center; gap: 0.5rem;
   }
@@ -179,11 +156,11 @@
   .visit-row.is-next { background: rgba(61,186,114,0.06); margin: 0 -1.25rem; padding: 0.55rem 1.5rem; }
   .visit-row.is-today { background: rgba(59,158,255,0.07); margin: 0 -1.25rem; padding: 0.55rem 1.5rem; }
 
-  .visit-date { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--ink); line-height: 1.4; padding-top: 0.1rem; }
-  .visit-dow { font-size: 0.57rem; color: var(--muted); display: block; }
+  .visit-date { font-family: 'DM Mono', monospace; font-size: 0.875rem; color: var(--ink); line-height: 1.4; padding-top: 0.1rem; }
+  .visit-dow { font-size: 0.75rem; color: var(--muted); display: block; }
 
   .ga-badge {
-    display: inline-block; font-family: 'DM Mono', monospace; font-size: 0.6rem;
+    display: inline-block; font-family: 'DM Mono', monospace; font-size: 0.78rem;
     padding: 0.1rem 0.4rem; border: 1px solid var(--border); background: var(--card); color: var(--muted);
     margin-top: 0.1rem;
   }
@@ -194,17 +171,17 @@
   /* ── Visit right column: tag + tasks ── */
   .visit-right { display: flex; flex-direction: column; gap: 0.35rem; }
 
-  .visit-tag-cell { font-family: 'DM Mono', monospace; font-size: 0.58rem; }
+  .visit-tag-cell { font-family: 'DM Mono', monospace; font-size: 0.8rem; }
   .tag-next  { color: var(--green); }
   .tag-today { color: var(--accent); }
-  .tag-past  { color: var(--muted); opacity: 0.5; font-size: 0.54rem; }
+  .tag-past  { color: var(--muted); opacity: 0.5; }
 
   /* ── Clinical task pills ── */
   .task-list { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.1rem; }
 
   .task-pill {
     font-family: 'DM Mono', monospace;
-    font-size: 0.56rem; letter-spacing: 0.04em;
+    font-size: 0.75rem; letter-spacing: 0.04em;
     padding: 0.15rem 0.5rem;
     border-radius: 0;
     white-space: nowrap;
@@ -284,7 +261,7 @@
     padding-top: 1.5rem; text-align: center; user-select: none;
   }
   .field-note {
-    font-family: 'DM Sans', sans-serif; font-size: 0.58rem;
+    font-family: 'DM Sans', sans-serif; font-size: 0.75rem;
     text-transform: none; letter-spacing: 0; color: var(--muted); font-weight: 300;
     opacity: 0.7; margin-left: 0.3rem;
   }
@@ -305,15 +282,15 @@
   }
   .ant-collapse-btn:hover { background: rgba(255,255,255,0.03); }
   .ant-collapse-label {
-    font-size: 0.65rem; letter-spacing: 0.12em; text-transform: uppercase;
+    font-size: 0.85rem; letter-spacing: 0.12em; text-transform: uppercase;
     color: var(--ink); font-weight: 500; flex: 1;
   }
   .ant-collapse-meta {
-    font-size: 0.58rem; color: var(--muted); letter-spacing: 0.05em;
+    font-size: 0.78rem; color: var(--muted); letter-spacing: 0.05em;
     transition: opacity 0.2s;
   }
   .ant-collapse-arrow {
-    font-size: 0.7rem; color: var(--muted);
+    font-size: 0.85rem; color: var(--muted);
     transition: transform 0.2s; display: inline-block;
   }
   .ant-section.open .ant-collapse-arrow { transform: rotate(90deg); }
@@ -327,14 +304,14 @@
 
   /* ── Antenatal testing ── */
   .ant-desc {
-    font-family: 'DM Sans', sans-serif; font-size: 0.72rem; color: var(--muted);
+    font-family: 'DM Sans', sans-serif; font-size: 0.875rem; color: var(--muted);
     margin-bottom: 0.65rem; line-height: 1.5;
   }
   .ant-grid {
     display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.5rem;
   }
   .ant-btn {
-    font-family: 'DM Mono', monospace; font-size: 0.62rem; letter-spacing: 0.06em;
+    font-family: 'DM Mono', monospace; font-size: 0.8rem; letter-spacing: 0.06em;
     padding: 0.35rem 0.75rem;
     background: var(--card); border: 1px solid var(--border); color: var(--muted);
     cursor: pointer; transition: all 0.15s; white-space: nowrap;
@@ -351,20 +328,20 @@
   }
   .ant-diag-row:last-child { border-bottom: none; }
   .ant-diag-name {
-    font-family: 'DM Mono', monospace; font-size: 0.65rem; color: var(--accent);
+    font-family: 'DM Mono', monospace; font-size: 0.85rem; color: var(--accent);
     min-width: 9rem;
   }
   .ant-diag-field { display: flex; flex-direction: column; gap: 0.15rem; flex: 1; min-width: 130px; }
-  .ant-diag-field label { font-size: 0.54rem; }
+  .ant-diag-field label { font-size: 0.75rem; }
   .ant-diag-field input {
-    font-size: 0.78rem; padding: 0.35rem 0.5rem;
+    font-size: 0.9rem; padding: 0.35rem 0.5rem;
   }
   .ant-diag-ghost {
-    font-family: 'DM Mono', monospace; font-size: 0.56rem; color: var(--accent);
+    font-family: 'DM Mono', monospace; font-size: 0.78rem; color: var(--accent);
     opacity: 0.75; min-height: 0.9rem; padding-top: 0.1rem;
   }
   .ant-nst-info {
-    font-family: 'DM Mono', monospace; font-size: 0.58rem; color: var(--muted);
+    font-family: 'DM Mono', monospace; font-size: 0.78rem; color: var(--muted);
     padding: 0.5rem 0; border-top: 1px solid var(--border); margin-top: 0.25rem;
     line-height: 1.7;
   }
@@ -376,7 +353,7 @@
 
   /* ── Disclaimer ── */
   .disclaimer {
-    font-family: 'DM Sans', sans-serif; font-size: 0.72rem; line-height: 1.6;
+    font-family: 'DM Sans', sans-serif; font-size: 0.875rem; line-height: 1.6;
     color: #c8a84a;
     background: rgba(240,192,96,0.08);
     border: 1px solid rgba(240,192,96,0.3);
@@ -390,7 +367,7 @@
   .page-footer {
     text-align: center;
     padding: 2rem 0 0.5rem;
-    font-family: 'DM Mono', monospace; font-size: 0.62rem;
+    font-family: 'DM Mono', monospace; font-size: 0.8rem;
     color: var(--muted);
     letter-spacing: 0.12em;
     border-top: 1px solid var(--border);
@@ -400,7 +377,6 @@
   /* ── Guidelines section ── */
   .guidelines-section {
     border: 1px solid var(--border);
-    margin-top: 2rem;
     background: var(--surface);
   }
   .guidelines-btn {
@@ -410,16 +386,16 @@
   }
   .guidelines-btn:hover { background: rgba(255,255,255,0.03); }
   .guidelines-label {
-    font-family: 'DM Mono', monospace; font-size: 0.65rem;
+    font-family: 'DM Mono', monospace; font-size: 0.85rem;
     letter-spacing: 0.12em; text-transform: uppercase;
     color: var(--ink); font-weight: 500; flex: 1;
   }
   .guidelines-sub {
-    font-family: 'DM Mono', monospace; font-size: 0.58rem;
+    font-family: 'DM Mono', monospace; font-size: 0.78rem;
     color: var(--muted); letter-spacing: 0.04em;
   }
   .guidelines-arrow {
-    font-size: 0.7rem; color: var(--muted);
+    font-size: 0.85rem; color: var(--muted);
     transition: transform 0.2s; display: inline-block;
   }
   .guidelines-section.open .guidelines-arrow { transform: rotate(90deg); }
@@ -436,16 +412,16 @@
   }
   .gl-entry:last-of-type { border-bottom: none; }
   .gl-name {
-    font-family: 'DM Mono', monospace; font-size: 0.68rem;
+    font-family: 'DM Mono', monospace; font-size: 0.875rem;
     color: var(--accent); letter-spacing: 0.06em;
     margin-bottom: 0.3rem;
   }
   .gl-qualifier {
-    font-size: 0.58rem; color: var(--muted); font-weight: 400;
+    font-size: 0.78rem; color: var(--muted); font-weight: 400;
     letter-spacing: 0.03em; margin-left: 0.4rem;
   }
   .gl-detail {
-    font-family: 'DM Sans', sans-serif; font-size: 0.72rem;
+    font-family: 'DM Sans', sans-serif; font-size: 0.875rem;
     color: var(--ink); line-height: 1.5; opacity: 0.85;
   }
   .gl-sub-entries { display: flex; flex-direction: column; gap: 0.3rem; }
@@ -454,22 +430,40 @@
     gap: 1rem; flex-wrap: wrap;
   }
   .gl-sub-label {
-    font-family: 'DM Sans', sans-serif; font-size: 0.7rem;
+    font-family: 'DM Sans', sans-serif; font-size: 0.875rem;
     color: var(--ink); opacity: 0.8;
   }
   .gl-sub-detail {
-    font-family: 'DM Mono', monospace; font-size: 0.62rem;
+    font-family: 'DM Mono', monospace; font-size: 0.8rem;
     color: var(--muted); white-space: nowrap;
   }
   .gl-sub-warn .gl-sub-label { color: var(--amber); opacity: 1; }
   .gl-sub-warn .gl-sub-detail { color: var(--amber); }
   .gl-disclaimer {
-    font-family: 'DM Sans', sans-serif; font-size: 0.65rem;
+    font-family: 'DM Sans', sans-serif; font-size: 0.82rem;
     color: var(--muted); line-height: 1.6;
     margin-top: 1rem; padding-top: 0.75rem;
     border-top: 1px solid var(--border);
     font-style: italic;
   }
+
+  /* ── Date Calculator ── */
+  .date-calc-output {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--green);
+    padding: 0.65rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    margin-top: 0.65rem;
+  }
+  .date-calc-block { display: flex; flex-direction: column; gap: 0.15rem; }
+  .date-calc-label { font-family: 'DM Mono', monospace; font-size: 0.72rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); }
+  .date-calc-value { font-family: 'DM Mono', monospace; font-size: 0.95rem; color: var(--ink); }
+  .date-calc-sub   { font-family: 'DM Mono', monospace; font-size: 0.8rem; color: var(--muted); }
+  .date-calc-ga    { font-family: 'Syne', sans-serif; font-size: 1.3rem; font-weight: 700; color: var(--green); line-height: 1; }
 
   /* ── Animations ── */
   @keyframes fadeUp {
@@ -486,10 +480,6 @@
 </head>
 <body>
 <div class="page">
-<div style="background:#5a1a1a;border-bottom:2px solid #a03030;color:#f8d0d0;font-family:sans-serif;font-size:0.85rem;padding:10px 20px;text-align:center;margin-bottom:1rem;">
-  ⚠️ <strong>Experimental tool — not validated for clinical use.</strong> Always consult a qualified healthcare provider before making any medical decisions.
-</div>
-
   <header class="masthead">
     <p class="kicker">Prenatal Care Planner</p>
     <h1>Pregnancy Dates</h1>
@@ -519,10 +509,31 @@
         <label for="eddInput">EDD <span class="field-note">Due Date</span></label>
         <input type="text" id="eddInput" placeholder="mm/dd/yyyy or t+N" maxlength="20" autocomplete="off" oninput="onDateInput(event,'edd')">
         <div class="ghost-preview" id="eddGhost"></div>
+        <div class="ghost-preview" id="eddCountdown" style="color:var(--muted);"></div>
       </div>
     </div>
 
-    <div style="margin-top:1rem;">
+  </div>
+
+
+  <!-- Results -->
+  <div class="results" id="results">
+
+    <div class="trimesters" id="trimesters"></div>
+
+    <!-- Date / GA Calculator -->
+    <div class="section" style="margin-bottom:1rem;">
+      <div class="section-title">Date / GA Calculator</div>
+      <div class="field">
+        <label for="dateCalcInput">GA, Offset, or Date</label>
+        <input type="text" id="dateCalcInput" placeholder="37w  or  +2w  or  mm/dd/yyyy" maxlength="20" autocomplete="off" oninput="onDateCalcInput(event)">
+        <div class="ghost-preview" id="dateCalcError"></div>
+      </div>
+      <div class="date-calc-output" id="dateCalcOutput" style="display:none;"></div>
+    </div>
+
+    <!-- Visit Frequency -->
+    <div class="section" style="margin-bottom:1rem;">
       <div class="section-title" style="margin-bottom:0.5rem;">Visit Frequency</div>
       <div class="risk-toggle">
 
@@ -538,17 +549,6 @@
 
       </div>
     </div>
-  </div>
-
-
-  <!-- Results -->
-  <div class="results" id="results">
-
-    <div class="edd-banner" id="eddBanner"></div>
-
-    <div class="progress-wrap" id="progressWrap"></div>
-
-    <div class="trimesters" id="trimesters"></div>
 
     <!-- Antenatal Testing — collapsible -->
     <div class="ant-section">
@@ -571,6 +571,119 @@
           <button class="ant-btn" data-key="prior_iufd" onclick="toggleAnt('prior_iufd')">Prior IUFD</button>
         </div>
         <div id="antDiagFields"></div>
+
+        <div class="guidelines-section" style="margin-top:0.75rem;">
+          <button class="guidelines-btn" onclick="toggleGuidelines()">
+            <span class="guidelines-label">Rough Guidelines</span>
+            <span class="guidelines-sub">antenatal testing reference</span>
+            <span class="guidelines-arrow" id="guidelinesArrow">▸</span>
+          </button>
+          <div class="guidelines-body" id="guidelinesBody">
+
+            <div class="gl-entry">
+              <div class="gl-name">AMA</div>
+              <div class="gl-detail">≥35 years old at delivery · start 36w · weekly</div>
+            </div>
+
+            <div class="gl-entry">
+              <div class="gl-name">Oligohydramnios</div>
+              <div class="gl-detail">MVP &lt;2cm · start at diagnosis · NST + AFI 1–2×/week</div>
+            </div>
+
+            <div class="gl-entry">
+              <div class="gl-name">Polyhydramnios <span class="gl-qualifier">moderate–severe</span></div>
+              <div class="gl-detail">MVP ≥12 or AFI ≥30 · start 32–34w · 1–2×/week</div>
+            </div>
+
+            <div class="gl-entry">
+              <div class="gl-name">Cholestasis of Pregnancy</div>
+              <div class="gl-detail">If bile acids ≥40 · start at diagnosis · twice weekly</div>
+            </div>
+
+            <div class="gl-entry">
+              <div class="gl-name">Gestational DM <span class="gl-qualifier">GDMA2, medication-requiring</span></div>
+              <div class="gl-detail">Start 32w · twice weekly</div>
+            </div>
+
+            <div class="gl-entry">
+              <div class="gl-name">Pre-gestational DM <span class="gl-qualifier">T2DM</span></div>
+              <div class="gl-detail">Start 32w · twice weekly</div>
+            </div>
+
+            <div class="gl-entry">
+              <div class="gl-name">FGR / IUGR</div>
+              <div class="gl-sub-entries">
+                <div class="gl-sub">
+                  <span class="gl-sub-label">3rd–9th %ile, normal doppler</span>
+                  <span class="gl-sub-detail">Time of Dx · weekly</span>
+                </div>
+                <div class="gl-sub gl-sub-warn">
+                  <span class="gl-sub-label">&lt;3rd %ile or abnormal doppler</span>
+                  <span class="gl-sub-detail">Refer to MFM</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="gl-entry">
+              <div class="gl-name">Hypertension</div>
+              <div class="gl-sub-entries">
+                <div class="gl-sub">
+                  <span class="gl-sub-label">Chronic, well controlled</span>
+                  <span class="gl-sub-detail">32w · once weekly</span>
+                </div>
+                <div class="gl-sub">
+                  <span class="gl-sub-label">Chronic, poor control</span>
+                  <span class="gl-sub-detail">32w · twice weekly</span>
+                </div>
+                <div class="gl-sub">
+                  <span class="gl-sub-label">Gestational HTN</span>
+                  <span class="gl-sub-detail">Time of Dx · twice weekly</span>
+                </div>
+                <div class="gl-sub">
+                  <span class="gl-sub-label">Pre-eclampsia</span>
+                  <span class="gl-sub-detail">Time of Dx · twice weekly</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="gl-entry">
+              <div class="gl-name">Obesity</div>
+              <div class="gl-sub-entries">
+                <div class="gl-sub">
+                  <span class="gl-sub-label">Pre-pregnancy BMI 35–39 kg/m²</span>
+                  <span class="gl-sub-detail">37w · weekly</span>
+                </div>
+                <div class="gl-sub">
+                  <span class="gl-sub-label">Pre-pregnancy BMI ≥40 kg/m²</span>
+                  <span class="gl-sub-detail">34w · weekly</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="gl-entry">
+              <div class="gl-name">Post-dates</div>
+              <div class="gl-sub-entries">
+                <div class="gl-sub">
+                  <span class="gl-sub-label">41 weeks</span>
+                  <span class="gl-sub-detail">Twice weekly</span>
+                </div>
+                <div class="gl-sub">
+                  <span class="gl-sub-label">42 weeks</span>
+                  <span class="gl-sub-detail">Every other day</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="gl-entry">
+              <div class="gl-name">Prior IUFD</div>
+              <div class="gl-detail">Start 2 weeks before GA of earliest prior loss · NST twice weekly · AFI once weekly</div>
+            </div>
+
+            <div class="gl-disclaimer">These are rough guidelines for educational reference only. Clinical decisions should be individualized and made in consultation with a qualified provider.</div>
+
+          </div>
+        </div>
+
       </div>
     </div>
 
@@ -579,118 +692,6 @@
       <div id="visitList"></div>
     </div>
 
-  </div>
-
-  <div class="guidelines-section">
-    <button class="guidelines-btn" onclick="toggleGuidelines()">
-      <span class="guidelines-label">Rough Guidelines</span>
-      <span class="guidelines-sub">antenatal testing reference</span>
-      <span class="guidelines-arrow" id="guidelinesArrow">▸</span>
-    </button>
-    <div class="guidelines-body" id="guidelinesBody">
-
-      <div class="gl-entry">
-        <div class="gl-name">AMA</div>
-        <div class="gl-detail">≥35 years old at delivery · start 36w · weekly</div>
-      </div>
-
-      <div class="gl-entry">
-        <div class="gl-name">Oligohydramnios</div>
-        <div class="gl-detail">MVP &lt;2cm · start at diagnosis · NST + AFI 1–2×/week</div>
-      </div>
-
-      <div class="gl-entry">
-        <div class="gl-name">Polyhydramnios <span class="gl-qualifier">moderate–severe</span></div>
-        <div class="gl-detail">MVP ≥12 or AFI ≥30 · start 32–34w · 1–2×/week</div>
-      </div>
-
-      <div class="gl-entry">
-        <div class="gl-name">Cholestasis of Pregnancy</div>
-        <div class="gl-detail">If bile acids ≥40 · start at diagnosis · twice weekly</div>
-      </div>
-
-      <div class="gl-entry">
-        <div class="gl-name">Gestational DM <span class="gl-qualifier">GDMA2, medication-requiring</span></div>
-        <div class="gl-detail">Start 32w · twice weekly</div>
-      </div>
-
-      <div class="gl-entry">
-        <div class="gl-name">Pre-gestational DM <span class="gl-qualifier">T2DM</span></div>
-        <div class="gl-detail">Start 32w · twice weekly</div>
-      </div>
-
-      <div class="gl-entry">
-        <div class="gl-name">FGR / IUGR</div>
-        <div class="gl-sub-entries">
-          <div class="gl-sub">
-            <span class="gl-sub-label">3rd–9th %ile, normal doppler</span>
-            <span class="gl-sub-detail">Time of Dx · weekly</span>
-          </div>
-          <div class="gl-sub gl-sub-warn">
-            <span class="gl-sub-label">&lt;3rd %ile or abnormal doppler</span>
-            <span class="gl-sub-detail">Refer to MFM</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="gl-entry">
-        <div class="gl-name">Hypertension</div>
-        <div class="gl-sub-entries">
-          <div class="gl-sub">
-            <span class="gl-sub-label">Chronic, well controlled</span>
-            <span class="gl-sub-detail">32w · once weekly</span>
-          </div>
-          <div class="gl-sub">
-            <span class="gl-sub-label">Chronic, poor control</span>
-            <span class="gl-sub-detail">32w · twice weekly</span>
-          </div>
-          <div class="gl-sub">
-            <span class="gl-sub-label">Gestational HTN</span>
-            <span class="gl-sub-detail">Time of Dx · twice weekly</span>
-          </div>
-          <div class="gl-sub">
-            <span class="gl-sub-label">Pre-eclampsia</span>
-            <span class="gl-sub-detail">Time of Dx · twice weekly</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="gl-entry">
-        <div class="gl-name">Obesity</div>
-        <div class="gl-sub-entries">
-          <div class="gl-sub">
-            <span class="gl-sub-label">Pre-pregnancy BMI 35–39 kg/m²</span>
-            <span class="gl-sub-detail">37w · weekly</span>
-          </div>
-          <div class="gl-sub">
-            <span class="gl-sub-label">Pre-pregnancy BMI ≥40 kg/m²</span>
-            <span class="gl-sub-detail">34w · weekly</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="gl-entry">
-        <div class="gl-name">Post-dates</div>
-        <div class="gl-sub-entries">
-          <div class="gl-sub">
-            <span class="gl-sub-label">41 weeks</span>
-            <span class="gl-sub-detail">Twice weekly</span>
-          </div>
-          <div class="gl-sub">
-            <span class="gl-sub-label">42 weeks</span>
-            <span class="gl-sub-detail">Every other day</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="gl-entry">
-        <div class="gl-name">Prior IUFD</div>
-        <div class="gl-detail">Start 2 weeks before GA of earliest prior loss · NST twice weekly · AFI once weekly</div>
-      </div>
-
-      <div class="gl-disclaimer">These are rough guidelines for educational reference only. Clinical decisions should be individualized and made in consultation with a qualified provider.</div>
-
-    </div>
   </div>
 
   <footer class="page-footer">
@@ -1003,9 +1004,16 @@
   }
 
   function toggleAnt(key) {
-    if (!antState[key]) antState[key] = { active: false, diagGaDays: null };
-    antState[key].active = !antState[key].active;
-    document.querySelector(`.ant-btn[data-key="${key}"]`).classList.toggle('active', antState[key].active);
+    const alreadyActive = antState[key] && antState[key].active;
+    // Deactivate all
+    Object.keys(antState).forEach(k => { if (antState[k]) antState[k].active = false; });
+    document.querySelectorAll('.ant-btn').forEach(b => b.classList.remove('active'));
+    // Activate the clicked one unless it was already active (click again = deselect)
+    if (!alreadyActive) {
+      if (!antState[key]) antState[key] = { active: false, diagGaDays: null };
+      antState[key].active = true;
+      document.querySelector(`.ant-btn[data-key="${key}"]`).classList.add('active');
+    }
     updateAntMeta();
     renderAntDiagFields();
     calculate();
@@ -1115,7 +1123,7 @@
     // Clear field styling
     [lmpInput, gaInput, eddInput].forEach(el => el.classList.remove('driver','derived'));
 
-    if (!lmp || !edd) { results.classList.remove('visible'); return; }
+    if (!lmp || !edd) { results.classList.remove('visible'); document.getElementById('eddCountdown').textContent = ''; return; }
 
     // Fill derived fields
     const lmpFmt = `${String(lmp.getMonth()+1).padStart(2,'0')}/${String(lmp.getDate()).padStart(2,'0')}/${lmp.getFullYear()}`;
@@ -1140,9 +1148,12 @@
       lmpInput.classList.add('derived'); gaInput.classList.add('derived');
     }
 
-    if (daysGA < 0 || daysGA > 308) { results.classList.remove('visible'); return; }
+    if (daysGA < 0 || daysGA > 308) { results.classList.remove('visible'); document.getElementById('eddCountdown').textContent = ''; return; }
 
     lmpDate = lmp;
+
+    // Update date calc output (LMP may have changed)
+    updateDateCalc(document.getElementById('dateCalcInput').value);
 
     // Re-evaluate any ant diag date ghosts now that LMP is known
     Object.keys(antState).forEach(key => {
@@ -1153,57 +1164,16 @@
 
     const weeksGA   = Math.floor(daysGA / 7);
     const daysRem   = daysBetween(today, edd);
-    const pct       = Math.min(1, Math.max(0, daysGA / 280));
 
-    // ── EDD banner ────────────────────────────────────────────────────────
+// ── EDD banner ────────────────────────────────────────────────────────
     const daysRemStr = daysRem > 0 ? `${daysRem} days to EDD`
       : daysRem === 0 ? 'EDD is today'
       : `${Math.abs(daysRem)} days past EDD`;
 
-    document.getElementById('eddBanner').innerHTML = `
-      <div class="edd-block">
-        <span class="edd-label">EDD (LMP + 280d)${source==='edd'?' · entered':'· calculated'}</span>
-        <span class="edd-value">${fmtShort(edd)}, ${edd.getFullYear()}</span>
-        <span class="edd-sub">${fmtDow(edd)}</span>
-      </div>
-      <div class="edd-divider"></div>
-      <div class="edd-block">
-        <span class="edd-label">Gestational Age${source==='ga'?' · entered':'· calculated'}</span>
-        <span class="edd-value" style="color:var(--ink)">${fmtGA(daysGA)}</span>
-        <span class="edd-sub">${daysRemStr}</span>
-      </div>
-      <div class="edd-divider"></div>
-      <div class="edd-block">
-        <span class="edd-label">LMP${source==='lmp'?' · entered':'· calculated'}</span>
-        <span style="font-family:'DM Mono',monospace;font-size:0.88rem;color:${source==='edd'||source==='ga'?'var(--gold)':'var(--ink)'};font-weight:500;">${fmtShort(lmp)}, ${lmp.getFullYear()}</span>
-        <span class="edd-sub">${fmtDow(lmp)}</span>
-      </div>
-    `;
+    document.getElementById('eddCountdown').textContent = daysRemStr;
 
-    // ── Progress bar ──────────────────────────────────────────────────────
-    const t1Frac = Math.min(13/40, pct);
-    const t2Frac = pct > 13/40 ? Math.min(14/40, pct - 13/40) : 0;
-    const t3Frac = pct > 27/40 ? Math.min(13/40, pct - 27/40) : 0;
-    const remFrac = Math.max(0, 1 - pct);
 
-    document.getElementById('progressWrap').innerHTML = `
-      <div class="progress-label">
-        <span>Pregnancy Progress</span>
-        <span style="color:var(--ink)">${Math.round(pct*100)}%</span>
-      </div>
-      <div class="progress-track">
-        <div class="p-t1" style="width:${t1Frac*100}%"></div>
-        <div class="p-t2" style="width:${t2Frac*100}%"></div>
-        <div class="p-t3" style="width:${t3Frac*100}%"></div>
-        <div class="p-rem" style="width:${remFrac*100}%"></div>
-        <div class="progress-now" style="left:${pct*100}%"></div>
-      </div>
-      <div class="progress-ticks">
-        <span>LMP</span><span>13w</span><span>28w</span><span>EDD (40w)</span>
-      </div>
-    `;
-
-    // ── Trimesters ────────────────────────────────────────────────────────
+// ── Trimesters ────────────────────────────────────────────────────────
     const curTri  = getTrimester(weeksGA);
     const t1Start = lmp, t1End = addDays(lmp, 13*7-1);
     const t2Start = addDays(lmp, 13*7), t2End = addDays(lmp, 27*7+6);
@@ -1287,6 +1257,100 @@
     });
 
     document.getElementById('visitList').innerHTML = html;
+  }
+
+  // ── Date / GA Calculator ───────────────────────────────────────────────────
+  // Parse offset strings: +2w, -1d, +1w3d, 2w, 3d etc.
+  function parseOffsetDays(str) {
+    const s = str.toLowerCase().replace(/\s/g, '');
+    const m = s.match(/^([+\-]?)(?:(\d+)w)?(?:(\d+)d)?$/);
+    if (!m || (!m[2] && !m[3])) return null;
+    const sign = m[1] === '-' ? -1 : 1;
+    const weeks = m[2] ? parseInt(m[2]) : 0;
+    const days  = m[3] ? parseInt(m[3]) : 0;
+    if (weeks === 0 && days === 0) return null;
+    return sign * (weeks * 7 + days);
+  }
+
+  // +/- prefix → offset from today; bare XwYd → GA lookup
+  function isOffsetInput(s) { return /^[+\-]/.test(s); }
+  function isGAInput(s)     { return /^\d+w(\d+d?)?$/i.test(s.replace(/\s/g,'')); }
+
+  function onDateCalcInput(e) {
+    const input = e.target;
+    const raw = input.value;
+    const s = raw.trim();
+    // Auto-slash only when typing a calendar date (not an offset or GA)
+    if (!isOffsetInput(s) && !isGAInput(s)) {
+      applyAutoSlash(input, e);
+    }
+    updateDateCalc(raw);
+  }
+
+  function updateDateCalc(raw) {
+    const output  = document.getElementById('dateCalcOutput');
+    const errorEl = document.getElementById('dateCalcError');
+    if (!output) return;
+
+    if (!lmpDate || !raw.trim()) {
+      output.style.display = 'none';
+      if (errorEl) errorEl.textContent = '';
+      return;
+    }
+
+    const today = dateOnly(new Date());
+    let targetDate = null;
+    let inputGaDays = null; // set when the user typed a GA directly
+    const s = raw.trim();
+
+    if (isOffsetInput(s)) {
+      // +2w, -1d, +1w4d etc. — relative to today
+      const offsetDays = parseOffsetDays(s);
+      if (offsetDays !== null) targetDate = addDays(today, offsetDays);
+    } else if (isGAInput(s)) {
+      // 37w, 37w0d — look up the date in this pregnancy
+      inputGaDays = parseGA(s);
+      if (inputGaDays !== null) targetDate = addDays(lmpDate, inputGaDays);
+    } else {
+      // Calendar date or existing relative (t, t+N)
+      const cal = parseCalDate(s);
+      if (cal) {
+        targetDate = cal;
+      } else {
+        const rel = parseRelDate(s);
+        if (rel) targetDate = rel.date;
+      }
+    }
+
+    if (!targetDate) {
+      output.style.display = 'none';
+      if (errorEl) errorEl.textContent = s ? 'unrecognized — try 37w, +2w, +1d, or mm/dd/yyyy' : '';
+      return;
+    }
+
+    if (errorEl) errorEl.textContent = '';
+
+    // When user typed a GA, use it directly; otherwise derive from lmpDate
+    const gaDays   = inputGaDays !== null ? inputGaDays : daysBetween(lmpDate, targetDate);
+    const gaDisplay = gaDays >= 0 ? fmtGA(gaDays) : '—';
+    const gaNote    = gaDays < 0 ? 'before LMP' : gaDays > 308 ? 'past EDD' : '';
+    const dateLabel = inputGaDays !== null ? `Date at ${fmtGA(inputGaDays)}` : 'Date';
+    const gaLabel   = inputGaDays !== null ? 'GA entered' : 'GA at date';
+
+    output.style.display = 'flex';
+    output.innerHTML = `
+      <div class="date-calc-block">
+        <span class="date-calc-label">${dateLabel}</span>
+        <span class="date-calc-value">${fmtFull(targetDate)}</span>
+        <span class="date-calc-sub">${fmtDow(targetDate)}</span>
+      </div>
+      <div class="edd-divider"></div>
+      <div class="date-calc-block">
+        <span class="date-calc-label">${gaLabel}</span>
+        <span class="date-calc-ga">${gaDisplay}</span>
+        ${gaNote ? `<span class="date-calc-sub">${gaNote}</span>` : ''}
+      </div>
+    `;
   }
 
   // ── Init ───────────────────────────────────────────────────────────────────
