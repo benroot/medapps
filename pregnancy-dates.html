@@ -550,6 +550,16 @@
 
     <div class="trimesters" id="trimesters"></div>
 
+    <!-- GA ⇄ Date Lookup -->
+    <div class="section" style="margin-bottom:1rem;">
+      <div class="section-title">GA ⇄ Date Lookup</div>
+      <div class="field">
+        <label for="convInput">Date or GA <span class="field-note">mm/dd/yyyy, t±N, or 32w4d</span></label>
+        <input type="text" id="convInput" placeholder="mm/dd/yyyy or 32w4d" maxlength="20" autocomplete="off" oninput="onConvertInput(event)">
+        <div class="ghost-preview" id="convGhost"></div>
+      </div>
+    </div>
+
     <!-- Antenatal Testing — collapsible -->
     <div class="ant-section">
       <button class="ant-collapse-btn" id="antCollapseBtn" onclick="toggleAntSection()">
@@ -859,6 +869,46 @@
     calculate();
   }
 
+  // ── GA ⇄ Date converter ───────────────────────────────────────────────────
+  // Accepts the same date/relative/GA formats as the main fields, but resolves
+  // them against the already-established pregnancy (lmpDate) instead of
+  // driving it — a date in → GA out, a GA in → date out.
+  function onConvertInput(e) {
+    const input = e.target;
+    const raw = input.value;
+    // Don't auto-slash GA-style or relative input, only calendar-looking input
+    if (!/w/i.test(raw) && !/^[twmyTWMY]/i.test(raw.trim())) {
+      applyAutoSlash(input, e);
+    }
+    updateConverter();
+  }
+
+  function updateConverter() {
+    const ghost = document.getElementById('convGhost');
+    const input = document.getElementById('convInput');
+    if (!ghost || !input || !lmpDate) return;
+    const raw = input.value.trim();
+    if (!raw) { ghost.textContent = ''; return; }
+
+    const gaDays = parseGA(raw);
+    if (gaDays !== null) {
+      const d = addDays(lmpDate, gaDays);
+      ghost.textContent = `${fmtFull(d)} · ${fmtDow(d)}`;
+      return;
+    }
+
+    const r = resolveDate(raw);
+    if (r) {
+      const diffDays = daysBetween(lmpDate, r.date);
+      ghost.textContent = diffDays >= 0
+        ? `${fmtGA(diffDays)} GA`
+        : `${fmtGA(-diffDays)} before LMP`;
+      return;
+    }
+
+    ghost.textContent = '';
+  }
+
   // ── Risk ───────────────────────────────────────────────────────────────────
   function setRisk(r) {
     riskMode = r;
@@ -1140,8 +1190,6 @@
       lmpInput.classList.add('derived'); gaInput.classList.add('derived');
     }
 
-    if (daysGA < 0 || daysGA > 308) { results.classList.remove('visible'); return; }
-
     lmpDate = lmp;
 
     // Re-evaluate any ant diag date ghosts now that LMP is known
@@ -1287,6 +1335,8 @@
     });
 
     document.getElementById('visitList').innerHTML = html;
+
+    updateConverter();
   }
 
   // ── Init ───────────────────────────────────────────────────────────────────
